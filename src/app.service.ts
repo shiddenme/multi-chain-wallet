@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { Web3Service } from './shared/services';
+
 
 @Injectable()
 export class AppService {
 
   constructor(
-    private readonly config: ConfigService,
+    private readonly web3Service: Web3Service,
   ) {}
-  getHello(): string {
-    
-    console.log(this.config.get('web3'))
+  async getHello(): Promise<string> {
+    await this.web3Service.syncBlocks();
     return 'Hello World!';
   }
 }

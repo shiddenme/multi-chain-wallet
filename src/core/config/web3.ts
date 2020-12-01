@@ -10,3 +10,4 @@ export default registerAs('web3', () => {
         reconnect
     };
 });
+
