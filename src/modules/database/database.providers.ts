@@ -1,6 +1,6 @@
 import { Sequelize } from 'sequelize-typescript';
 import { ConfigService } from '@nestjs/config'
-import { Block } from '../block/block.entity'
+import { Block,Block1 } from '../block/block.entity'
 
 export const databaseProviders = [
   {
@@ -14,7 +14,7 @@ export const databaseProviders = [
         port:3306,
         dialect: 'mysql'
       });
-      sequelize.addModels([Block]);
+      sequelize.addModels([Block,Block1]);
       await sequelize.sync({
         force: false
       });
