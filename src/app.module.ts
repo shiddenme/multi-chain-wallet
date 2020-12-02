@@ -3,14 +3,15 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CoreModule } from './core';
 import { SharedModule } from './shared'
-import { BlockModule } from './modules'
+import { EthBlockModule, EthTokenModule } from './modules'
 
 
 @Module({
   imports: [
     CoreModule,
     SharedModule,
-    BlockModule
+    EthBlockModule,
+    EthTokenModule
   ],
   controllers: [AppController],
   providers: [AppService],
