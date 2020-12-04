@@ -5,5 +5,5 @@ export function whickBlockRepo(blockNumber: number): number {
 
 export function whickTransacionRepo(blockNumber: number): number {
     if(!blockNumber) return 1
-    return Math.ceil(blockNumber/2000000) 
+    return Math.ceil(blockNumber/2500000) 
 }

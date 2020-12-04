@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { EthBlockService, EthUncleService, EthTransactionService } from '../../modules'
+import { EthBlockService, EthUncleService, EthTransactionService, EthTokenService } from '../../modules'
 
 import {
     sleep, getConstReward, getFoundationPercent, getUncleReward, getRewardForUncle
 } from '../utils'
 import * as R from 'ramda'
+import { erc20AbI } from '../abi/erc20'
 
 
 const Web3 = require('web3')
@@ -18,6 +19,7 @@ export class Web3Service {
         private readonly blockService: EthBlockService,
         private readonly uncleService: EthUncleService,
         private readonly transactionService: EthTransactionService,
+        private readonly tokenService: EthTokenService,
         private readonly config: ConfigService
     ) { }
 
@@ -107,10 +109,14 @@ export class Web3Service {
     }
 
     async syncBlocks() { 
-        const blockNumber = await this.blockService.findLargestBlockNumber();
-        console.log('start block:', blockNumber);
-        this.listenBlock(blockNumber);
-        this.listenBlockTransactions(blockNumber + 1);
+        const number = await this.blockService.findLargestBlockNumber();
+        console.log('start block:', number);
+        this.listenBlock(number);
+        // const blockNumber = await this.transactionService.findLargestBlockNumber()
+        
+        const blockNumber = 1500000;
+        console.log('start transaction:', blockNumber);
+        this.listenBlockTransactions(blockNumber);
     }
 
     async listenBlockTransactions(blockNumber) { 
@@ -129,10 +135,11 @@ export class Web3Service {
             const queue = [];
             for (let i = 0; i < result.transactions.length; i++) {
                 const transaction = result.transactions[i];
+              
                 (transaction.input === '0x' || transaction.input.length > 50000) && (transaction.input = '0x0');
                 const transactionObj = R.pick([
                     'blockHash', 'blockNumber', 'from', 'gas', 'gasPrice', 'hash', 'input',
-                    'nonce', 'to', 'transactionIndex', 'value', 'status'
+                    'nonce', 'to', 'transactionIndex', 'value'
                 ])(transaction)
                 queue.push(this.transactionService.findOrCreate(transactionObj))
             }
@@ -156,4 +163,6 @@ export class Web3Service {
         }
         return txsFee
     }
+    
 }
+

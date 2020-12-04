@@ -27,7 +27,7 @@ class Eth_Transaction extends Model<Eth_Transaction> {
     public hash: BinaryType;
 
     @Column({
-        type: 'binary(64)',
+        type: 'varbinary(64)',
     })
     public from: BinaryType;
 
@@ -46,7 +46,7 @@ class Eth_Transaction extends Model<Eth_Transaction> {
     @Column({ type: DataType.MEDIUMINT })
     public nonce: number;
 
-    @Column({ type: 'binary(64)' })
+    @Column({ type: 'varbinary(64)' })
     public to: BinaryType;
 
     @Column({ type: DataType.SMALLINT })
@@ -77,4 +77,23 @@ export class Eth_Transaction_2 extends Eth_Transaction { }
     freezeTableName: true
 })
 export class Eth_Transaction_3 extends Eth_Transaction { }
+
+@Table({
+    timestamps: false,
+    freezeTableName: true
+})
+export class Eth_Transaction_4 extends Eth_Transaction { }
+
+@Table({
+    timestamps: false,
+    freezeTableName: true
+})
+export class Eth_Transaction_5 extends Eth_Transaction { }
+
+
+@Table({
+    timestamps: false,
+    freezeTableName: true
+})
+export class Eth_Transaction_6 extends Eth_Transaction { }
 

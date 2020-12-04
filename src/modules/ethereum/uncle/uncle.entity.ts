@@ -30,7 +30,7 @@ export class Eth_Uncle extends Model<Eth_Uncle> {
     public gasUsed: number;
 
     @Column({ 
-        type: 'binary(128)',
+        type: 'varbinary(128)',
         primaryKey: true,
      })
     public hash: BinaryType;
@@ -38,34 +38,34 @@ export class Eth_Uncle extends Model<Eth_Uncle> {
     @Column({ type: 'varbinary(1024)' })
     public logsBloom: BinaryType;
 
-    @Column({ type: 'binary(64)' })
+    @Column({ type: 'varbinary(64)' })
     public miner: BinaryType;
 
-    @Column({ type: 'binary(128)' })
+    @Column({ type: 'varbinary(128)' })
     public mixHash: BinaryType;
 
-    @Column({ type: 'binary(32)' })
+    @Column({ type: 'varbinary(32)' })
     public nonce: BinaryType;
 
-    @Column({ type: 'binary(128)' })
+    @Column({ type: 'varbinary(128)' })
     public parentHash: BinaryType;
 
-    @Column({ type: 'binary(128)' })
+    @Column({ type: 'varbinary(128)' })
     public receiptsRoot: BinaryType;
 
-    @Column({ type: 'binary(128)' })
+    @Column({ type: 'varbinary(128)' })
     public sha3Uncles: BinaryType;
 
     @Column({ type: DataType.MEDIUMINT })
     public size: number;
 
-    @Column({ type: 'binary(128)' })
+    @Column({ type: 'varbinary(128)' })
     public stateRoot: number;
 
     @Column({ type: DataType.INTEGER })
     public timestamp: number;
 
-    @Column({ type: 'binary(128)' })
+    @Column({ type: 'varbinary(128)' })
     public transactionsRoot: number;
 
     @Column({ type: DataType.SMALLINT })

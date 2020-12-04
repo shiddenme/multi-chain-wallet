@@ -3,6 +3,7 @@ import * as ethBLocks from '../ethereum/block/block.entity'
 import * as ethTransactions from '../ethereum/transaction/transaction.entity'
 import { Eth_Uncle } from '../ethereum/uncle/uncle.entity'
 import { Eth_Token } from '../ethereum/token/token.entity'
+import { Eth_Wallet_Token } from '../ethereum/walletToken/walletToken.entity'
 import * as R from 'ramda'
 export const databaseProviders = [
   {
@@ -17,7 +18,7 @@ export const databaseProviders = [
         dialect: 'mysql'
       }); 
       sequelize.addModels(Object.values(R.mergeAll([ethBLocks, ethTransactions, {
-        Eth_Uncle, Eth_Token
+        Eth_Uncle, Eth_Token, Eth_Wallet_Token
       }])));
       await sequelize.sync({
         force: false

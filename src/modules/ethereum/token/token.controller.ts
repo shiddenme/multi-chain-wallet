@@ -12,16 +12,15 @@ import {
     Query
 } from '@nestjs/common';
 
-
+import { findTokenDto } from './dto/find_token.dto'
 import { EthTokenService } from './token.service'
 
-@Controller('token')
+@Controller()
 export class EthTokenController {
     constructor(private readonly tokenService : EthTokenService) {}
 
-    @Get()
-    async findAll(@Query() query) { 
-        console.log(query)
+    @Get('/token')
+    async findAll(@Query() query:findTokenDto) { 
        return await this.tokenService.findAll(query) 
     }
    

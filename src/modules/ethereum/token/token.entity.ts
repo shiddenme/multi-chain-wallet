@@ -1,7 +1,8 @@
 import {
     Table,
     Column,
-    Model
+    Model,
+    DataType
 } from 'sequelize-typescript';
 
 @Table({
@@ -18,10 +19,21 @@ export class Eth_Token extends Model<Eth_Token> {
     @Column({
         type: 'varchar(64)'
     })
-    public token: string;
+    public symbol: string;
     
     @Column({
         type: 'varchar(512)'
     })
-    public icon : string;
+    public icon: string;
+
+    @Column({
+        type: 'varchar(64)'
+    })
+    public name: string;
+    
+    @Column({
+        type: DataType.INTEGER
+    })
+    public sort: number;
+
 }

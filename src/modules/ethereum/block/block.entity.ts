@@ -43,28 +43,28 @@ class Eth_Block extends Model<Eth_Block> {
     })
     public gasUsed: number;
 
-    @Column({ type: 'binary(128)' })
+    @Column({ type: 'varbinary(128)' })
     public hash: BinaryType;
     
     @Column({ type: 'varbinary(1024)' })
     public logsBloom: BinaryType;
 
-    @Column({ type: 'binary(64)' })
+    @Column({ type: 'varbinary(64)' })
     public miner: BinaryType;
 
-    @Column({ type: 'binary(128)' })
+    @Column({ type: 'varbinary(128)' })
     public mixHash: BinaryType;
 
-    @Column({ type: 'binary(32)' })
+    @Column({ type: 'varbinary(32)' })
     public nonce: BinaryType;
 
-    @Column({ type: 'binary(128)' })
+    @Column({ type: 'varbinary(128)' })
     public parentHash: BinaryType;
 
-    @Column({ type: 'binary(128)' })
+    @Column({ type: 'varbinary(128)' })
     public receiptsRoot: BinaryType;
 
-    @Column({ type: 'binary(128)' })
+    @Column({ type: 'varbinary(128)' })
     public sha3Uncles: BinaryType;
 
     @Column({ type: DataType.SMALLINT })
@@ -85,7 +85,7 @@ class Eth_Block extends Model<Eth_Block> {
     @Column({ type: DataType.MEDIUMINT })
     public size: number;
 
-    @Column({ type: 'binary(128)' })
+    @Column({ type: 'varbinary(128)' })
     public stateRoot: BinaryType;
 
     @Column({ type: DataType.INTEGER })
@@ -94,7 +94,7 @@ class Eth_Block extends Model<Eth_Block> {
     @Column({ type: 'varbinary(32)' })
     public totalDifficulty: BinaryType;
     
-    @Column({ type: 'binary(128)' })
+    @Column({ type: 'varbinary(128)' })
     public transactionsRoot: number;
 
 }
