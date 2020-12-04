@@ -9,12 +9,12 @@ import {
 } from '@nestjs/common';
 import { walletTokenDto, findWalletTokenDto } from './dto'
 
-import { EthWalletTokenService } from './walletToken.service'
+import { SipcWalletTokenService } from './walletToken.service'
 
 
-@Controller('ETH')
-export class EthWalletTokenController {
-    constructor(private readonly walletTokenService : EthWalletTokenService) {}
+@Controller('SIPC')
+export class SipcWalletTokenController {
+    constructor(private readonly walletTokenService : SipcWalletTokenService) {}
 
     @Get('/wallet/token')
     async findAll(@Query() query: findWalletTokenDto) { 

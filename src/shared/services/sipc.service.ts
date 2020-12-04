@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
-    EthBlockService, EthUncleService, EthTransactionService,
     SipcBlockService, SipcUncleService, SipcTransactionService
 } from '../../modules'
 
@@ -15,22 +14,21 @@ const Web3 = require('web3')
 const BN = require('bn.js');
 
 @Injectable()
-export class Web3Service {
-    private readonly web3 = new Web3(new Web3.providers.HttpProvider(this.config.get('web3')['gethServer']))
+export class SipcService {
+    private readonly sipc = new Web3(new Web3.providers.HttpProvider('https://explorer.simplechain.com/rpc'))
     constructor(
-        private readonly ethBlcokService: EthBlockService,
-        private readonly ethUncleService: EthUncleService,
-        private readonly ethTransactionService: EthTransactionService,
-        private readonly config: ConfigService
+        private readonly sipcBlcokService: SipcBlockService,
+        private readonly sipcUncleService: SipcUncleService,
+        private readonly sipcTransactionService: SipcTransactionService
     ) { }
 
     async setProvider() { 
         try { 
-            await this.web3.eth.net.isListening();
+            await this.sipc.eth.net.isListening();
         } catch (e) {
             console.log(e)
-            console.log('[ - ] Lost connection to the node, reconnecting', this.config.get('web3')['gethServer']);
-            await this.web3.setProvider(new Web3.providers.HttpProvider(this.config.get('web3')['gethServer']));
+            console.log('[ - ] Lost connection to the node, reconnecting', 'https://explorer.simplechain.com/rpc');
+            await this.sipc.setProvider(new Web3.providers.HttpProvider('https://explorer.simplechain.com/rpc'));
             await sleep(2000);
             await this.setProvider();
         }
@@ -40,7 +38,7 @@ export class Web3Service {
         if (blockNumber % 10 === 0) {
             console.log("Get block ", blockNumber);
         }
-        const currentHeight = await this.web3.eth.getBlockNumber();
+        const currentHeight = await this.sipc.eth.getBlockNumber();
         if (blockNumber > currentHeight){
             //confirm 20 blocks;
             setTimeout(async () => {
@@ -48,7 +46,7 @@ export class Web3Service {
             },1000);
             return false;
         }
-        const result = await this.web3.eth.getBlock(blockNumber, true);
+        const result = await this.sipc.eth.getBlock(blockNumber, true);
         if (R.isNil(result)){
             return false;
         }
@@ -67,7 +65,7 @@ export class Web3Service {
                     'totalDifficulty', 'timestamp','transactionsRoot'
                 ])(result)
 
-                await this.ethBlcokService.findOrCreate(R.mergeRight(options, {
+                await this.sipcBlcokService.findOrCreate(R.mergeRight(options, {
                     unclesCount,
                     minerReward,
                     foundation,
@@ -81,9 +79,9 @@ export class Web3Service {
       
             try {
               if (result.uncles.length > 0){
-                const count =  await this.web3.eth.getBlockUncleCount(blockNumber)
+                const count =  await this.sipc.eth.getBlockUncleCount(blockNumber)
                 for (let i = 0 ; i < count; i++){
-                    const uncle =  await this.web3.eth.getUncle(blockNumber,i)
+                    const uncle =  await this.sipc.eth.getUncle(blockNumber,i)
                     uncle.extraData === '0x' && (uncle.extraData = '0x0');
         
                     const uncleReward = getUncleReward(uncle.number, blockNumber, reward);
@@ -93,7 +91,7 @@ export class Web3Service {
                         'logsBloom', 'miner', 'mixHash', 'nonce', 'parentHash', 'receiptsRoot',
                         'sha3Uncles', 'size', 'stateRoot', 'timestamp', 'transactionsRoot'
                     ])(uncle)
-                    await this.ethUncleService.findOrCreate(R.mergeRight(uncleObj, {
+                    await this.sipcUncleService.findOrCreate(R.mergeRight(uncleObj, {
                         blockNumber,
                         uncleIndex: i,
                         reward: uncleReward
@@ -110,7 +108,7 @@ export class Web3Service {
     }
 
     async syncBlocks() { 
-        const number = await this.ethBlcokService.findLargestBlockNumber();
+        const number = await this.sipcBlcokService.findLargestBlockNumber();
         console.log('start block:', number);
         this.listenBlock(number);
         this.listenBlockTransactions(number + 1);
@@ -118,14 +116,14 @@ export class Web3Service {
 
     async listenBlockTransactions(blockNumber) { 
         try {
-            const currentHeight = await this.web3.eth.getBlockNumber();
+            const currentHeight = await this.sipc.eth.getBlockNumber();
             if (blockNumber > currentHeight) {
                 setTimeout(async () => {
                     await this.listenBlockTransactions(blockNumber);
                 }, 1000);
                 return false;
             }
-            const result = await this.web3.eth.getBlock(blockNumber, true)
+            const result = await this.sipc.eth.getBlock(blockNumber, true);
             if (R.isNil(result)) {
                 return false;
             }
@@ -138,7 +136,7 @@ export class Web3Service {
                     'blockHash', 'blockNumber', 'from', 'gas', 'gasPrice', 'hash', 'input',
                     'nonce', 'to', 'transactionIndex', 'value'
                 ])(transaction)
-                queue.push(this.ethTransactionService.findOrCreate(transactionObj))
+                queue.push(this.sipcTransactionService.findOrCreate(transactionObj))
             }
             await Promise.all(queue);
         } catch (e) { 
@@ -155,7 +153,7 @@ export class Web3Service {
         let txsFee = 0;
         for (let i = 0; i < length; i++) {
             const bigFee = (new BN(transactions[i].gas)).mul(new BN(transactions[i].gasPrice))
-            const fee = this.web3.utils.fromWei(bigFee)
+            const fee = this.sipc.utils.fromWei(bigFee)
             txsFee += parseFloat(fee)
         }
         return txsFee

@@ -15,7 +15,7 @@ import {
 import { findTokenDto } from './dto/find_token.dto'
 import { EthTokenService } from './token.service'
 
-@Controller()
+@Controller('ETH')
 export class EthTokenController {
     constructor(private readonly tokenService : EthTokenService) {}
 

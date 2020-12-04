@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import {
-  Eth_Transaction_1, Eth_Transaction_2, Eth_Transaction_3,
-  Eth_Transaction_4, Eth_Transaction_5, Eth_Transaction_6
+  Sipc_Transaction_1, Sipc_Transaction_2, Sipc_Transaction_3,
+  Sipc_Transaction_4, Sipc_Transaction_5, Sipc_Transaction_6
 } from './transaction.entity';
 import { whickTransacionRepo } from '../../../shared/utils/tools'
 
@@ -10,15 +10,15 @@ import * as R from 'ramda'
 
 
 @Injectable()
-export class EthTransactionService {
+export class SipcTransactionService {
   
   constructor(
-    @Inject('eth_transaction_repo_1') private readonly transactionRepo1: typeof Eth_Transaction_1,
-    @Inject('eth_transaction_repo_2') private readonly transactionRepo2: typeof Eth_Transaction_2,
-    @Inject('eth_transaction_repo_3') private readonly transactionRepo3: typeof Eth_Transaction_3,
-    @Inject('eth_transaction_repo_4') private readonly transactionRepo4: typeof Eth_Transaction_4,
-    @Inject('eth_transaction_repo_5') private readonly transactionRepo5: typeof Eth_Transaction_5,
-    @Inject('eth_transaction_repo_6') private readonly transactionRepo6: typeof Eth_Transaction_6,
+    @Inject('sipc_transaction_repo_1') private readonly transactionRepo1: typeof Sipc_Transaction_1,
+    @Inject('sipc_transaction_repo_2') private readonly transactionRepo2: typeof Sipc_Transaction_2,
+    @Inject('sipc_transaction_repo_3') private readonly transactionRepo3: typeof Sipc_Transaction_3,
+    @Inject('sipc_transaction_repo_4') private readonly transactionRepo4: typeof Sipc_Transaction_4,
+    @Inject('sipc_transaction_repo_5') private readonly transactionRepo5: typeof Sipc_Transaction_5,
+    @Inject('sipc_transaction_repo_6') private readonly transactionRepo6: typeof Sipc_Transaction_6,
   ) { }
   private readonly repoList = [
     this.transactionRepo1, this.transactionRepo2, this.transactionRepo3,

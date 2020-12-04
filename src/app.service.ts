@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { Web3Service } from './shared/services';
+import { SipcService } from './shared/services';
 
 @Injectable()
 export class AppService {
 
   constructor(
-    private readonly web3Service: Web3Service
+    private readonly sipcService: SipcService
   ) {}
   async getHello(): Promise<string> {
-    this.web3Service.syncBlocks();
+    this.sipcService.syncBlocks();
     return 'Hello World!';
   }
 }

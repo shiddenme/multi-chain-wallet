@@ -2,16 +2,17 @@ import {
     Controller,
     UseFilters,
     Get,
-    Query
+    Query,
+    BadRequestException
 } from '@nestjs/common';
 import { findTransactionDto } from './dto/find.dto'
 
-import { EthTransactionService } from './transaction.service'
+import { SipcTransactionService } from './transaction.service'
 import { HttpExceptionFilter } from '../../../core'
 
-@Controller('ETH')
-export class EthTransactionController {
-    constructor(private readonly transactionService : EthTransactionService) {}
+@Controller('SIPC')
+export class SipcTransactionController {
+    constructor(private readonly transactionService : SipcTransactionService) {}
 
     @Get('/transaction')
     @UseFilters(new HttpExceptionFilter())
