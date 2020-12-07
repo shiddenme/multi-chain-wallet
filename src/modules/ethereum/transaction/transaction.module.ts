@@ -7,10 +7,7 @@ import { DatabaseModule } from '../../database/database.module';
 @Module({
   controllers: [EthTransactionController],
   imports: [DatabaseModule],
-  providers: [
-    EthTransactionService,
-    ...EthTransactionProviders,
-  ],
-  exports:[EthTransactionService]
+  providers: [EthTransactionService, ...EthTransactionProviders],
+  exports: [EthTransactionService],
 })
 export class EthTransactionModule {}

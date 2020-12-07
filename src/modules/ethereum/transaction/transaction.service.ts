@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import {
   Eth_Transaction_1,
   Eth_Transaction_2,
@@ -11,10 +11,12 @@ import { whickTransacionRepo } from '../../../shared/utils/tools';
 
 import * as R from 'ramda';
 import { Op } from 'sequelize';
-
+import { Web3Service } from '../../../shared/services/web3.service';
 @Injectable()
 export class EthTransactionService {
   constructor(
+    @Inject(forwardRef(() => Web3Service))
+    private readonly web3Service: Web3Service,
     @Inject('eth_transaction_repo_1')
     private readonly transactionRepo1: typeof Eth_Transaction_1,
     @Inject('eth_transaction_repo_2')
@@ -117,13 +119,32 @@ export class EthTransactionService {
     }
     const res = await Promise.all(
       this.repoList.map(async (ele) => {
-        return await ele.findAll({
+        const transactions = await ele.findAll({
           where: options,
           attributes: {
             exclude: ['gasUsed', 'status'],
           },
           raw: true,
         });
+        return await Promise.all(
+          transactions.map(async (transaction) => {
+            const { hash } = transaction;
+
+            const transactionReceipt = await this.web3Service.getTransactionReceipt(
+              hash.toString(),
+            );
+            const {
+              cumulativeGasUsed,
+              gasUsed,
+              status = true,
+            } = transactionReceipt;
+            return R.mergeRight(transaction, {
+              cumulativeGasUsed,
+              gasUsed,
+              status,
+            });
+          }),
+        );
       }),
     );
     const transactions = R.flatten(

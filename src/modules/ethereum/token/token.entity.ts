@@ -1,39 +1,38 @@
-import {
-    Table,
-    Column,
-    Model,
-    DataType
-} from 'sequelize-typescript';
+import { Table, Column, Model, DataType } from 'sequelize-typescript';
 
 @Table({
-    timestamps: false,
-    freezeTableName: true
+  timestamps: false,
+  freezeTableName: true,
 })
-export class Eth_Token extends Model<Eth_Token> { 
-    @Column({
-        type: 'varchar(64)',
-        primaryKey: true
-    })
-    public contract: string;
+export class Eth_Token extends Model<Eth_Token> {
+  @Column({
+    type: 'varchar(64)',
+    primaryKey: true,
+  })
+  public contract: string;
 
-    @Column({
-        type: 'varchar(64)'
-    })
-    public symbol: string;
-    
-    @Column({
-        type: 'varchar(512)'
-    })
-    public icon: string;
+  @Column({
+    type: 'varchar(64)',
+  })
+  public symbol: string;
 
-    @Column({
-        type: 'varchar(64)'
-    })
-    public name: string;
-    
-    @Column({
-        type: DataType.INTEGER
-    })
-    public sort: number;
+  @Column({
+    type: 'varchar(512)',
+  })
+  public icon: string;
 
+  @Column({
+    type: 'varchar(64)',
+  })
+  public name: string;
+
+  @Column({
+    type: 'decimal(10,2)',
+  })
+  public price: number;
+
+  @Column({
+    type: DataType.INTEGER,
+  })
+  public sort: number;
 }

@@ -3,24 +3,9 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CoreModule } from './core';
 import { SharedModule } from './shared';
-import {
-  EthBlockModule,
-  EthTokenModule,
-  EthAssetModule,
-  EthTransactionModule,
-  SipcWalletTokenModule,
-} from './modules';
 
 @Module({
-  imports: [
-    CoreModule,
-    SharedModule,
-    EthBlockModule,
-    EthTokenModule,
-    EthAssetModule,
-    EthTransactionModule,
-    SipcWalletTokenModule,
-  ],
+  imports: [CoreModule, SharedModule],
   controllers: [AppController],
   providers: [AppService],
 })

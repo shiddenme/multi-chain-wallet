@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import {
   Sipc_Transaction_1,
   Sipc_Transaction_2,
@@ -10,10 +10,12 @@ import {
 import { whickTransacionRepo } from '../../../shared/utils/tools';
 import { Op } from 'sequelize';
 import * as R from 'ramda';
-
+import { Web3Service } from '../../../shared/services/web3.service';
 @Injectable()
 export class SipcTransactionService {
   constructor(
+    @Inject(forwardRef(() => Web3Service))
+    private readonly sipcService: Web3Service,
     @Inject('sipc_transaction_repo_1')
     private readonly transactionRepo1: typeof Sipc_Transaction_1,
     @Inject('sipc_transaction_repo_2')
@@ -116,13 +118,33 @@ export class SipcTransactionService {
     }
     const res = await Promise.all(
       this.repoList.map(async (ele) => {
-        return await ele.findAll({
+        const transactions = await ele.findAll({
           where: options,
           attributes: {
             exclude: ['gasUsed', 'status'],
           },
           raw: true,
         });
+        return await Promise.all(
+          transactions.map(async (transaction) => {
+            const { hash } = transaction;
+
+            const transactionReceipt = await this.sipcService.getTransactionReceipt(
+              hash.toString(),
+              false,
+            );
+            const {
+              cumulativeGasUsed,
+              gasUsed,
+              status = true,
+            } = transactionReceipt;
+            return R.mergeRight(transaction, {
+              cumulativeGasUsed,
+              gasUsed,
+              status,
+            });
+          }),
+        );
       }),
     );
     const transactions = R.flatten(
@@ -139,6 +161,7 @@ export class SipcTransactionService {
         input: item.input && item.input.toString(),
       });
     });
+
     return {
       transactions,
     };

@@ -4,9 +4,6 @@ import {
   EthBlockService,
   EthUncleService,
   EthTransactionService,
-  SipcBlockService,
-  SipcUncleService,
-  SipcTransactionService,
 } from '../../modules';
 
 import {
@@ -20,12 +17,25 @@ import * as R from 'ramda';
 
 const Web3 = require('web3');
 const BN = require('bn.js');
+import { erc20AbI } from '../abi/erc20';
+
+enum server {
+  ethereum,
+  simplechain,
+}
 
 @Injectable()
 export class Web3Service {
   private readonly web3 = new Web3(
     new Web3.providers.HttpProvider(this.config.get('web3')['gethServer']),
   );
+  public readonly sipc = new Web3(
+    new Web3.providers.HttpProvider('https://explorer.simplechain.com/rpc'),
+  );
+
+  public readonly web3Contract = new this.web3.eth.Contract(erc20AbI);
+  public readonly sipcContract = new this.sipc.eth.Contract(erc20AbI);
+
   constructor(
     private readonly ethBlcokService: EthBlockService,
     private readonly ethUncleService: EthUncleService,
@@ -33,20 +43,28 @@ export class Web3Service {
     private readonly config: ConfigService,
   ) {}
 
-  async setProvider() {
+  async myBalanceOf(contract, wallet, f: boolean = true) {
+    const myContract = f ? this.web3Contract : this.sipcContract;
+    myContract.options.address = contract;
+
+    return await myContract.methods.balanceOf(wallet).call();
+  }
+
+  async getTransactionReceipt(hash: string, f: boolean = true) {
+    const link = f ? this.web3 : this.sipc;
+    return await link.eth.getTransactionReceipt(hash);
+  }
+
+  async setProvider(url?: string) {
+    url || (url = this.config.get('web3')['gethServer']);
     try {
       await this.web3.eth.net.isListening();
     } catch (e) {
       console.log(e);
-      console.log(
-        '[ - ] Lost connection to the node, reconnecting',
-        this.config.get('web3')['gethServer'],
-      );
-      await this.web3.setProvider(
-        new Web3.providers.HttpProvider(this.config.get('web3')['gethServer']),
-      );
+      console.log('[ - ] Lost connection to the node, reconnecting', url);
+      await this.web3.setProvider(new Web3.providers.HttpProvider(url));
       await sleep(2000);
-      await this.setProvider();
+      await this.setProvider(url);
     }
   }
 

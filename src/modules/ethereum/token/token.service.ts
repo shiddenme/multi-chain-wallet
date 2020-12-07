@@ -1,14 +1,14 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { Eth_Token } from './token.entity';
 
-import { EthTransactionService } from '../transaction/transaction.service';
 import * as R from 'ramda';
-
+import { Web3Service } from '../../../shared/services/web3.service';
 @Injectable()
 export class EthTokenService {
   constructor(
     @Inject('eth_token_repo') private readonly tokenRepo: typeof Eth_Token,
-    private readonly transactionService: EthTransactionService,
+    @Inject(forwardRef(() => Web3Service))
+    private readonly web3Service: Web3Service,
   ) {}
 
   async findAll(where) {
@@ -28,5 +28,22 @@ export class EthTokenService {
       where: R.pick(['contract', 'symbol'])(where),
       raw: true,
     });
+  }
+
+  async findAsset(where) {
+    const { wallet, contracts } = where;
+    const tokens = await Promise.all(
+      contracts.split(',').map(async (contract) => {
+        const token = await this.findOne({ contract });
+        const balance = await this.web3Service.myBalanceOf(contract, wallet);
+        return R.mergeRight(token, {
+          balance,
+        });
+      }),
+    );
+    return {
+      wallet,
+      tokens,
+    };
   }
 }

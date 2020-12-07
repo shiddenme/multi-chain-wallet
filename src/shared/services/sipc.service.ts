@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+
 import {
   SipcBlockService,
   SipcUncleService,
@@ -16,29 +16,31 @@ import {
 import * as R from 'ramda';
 
 const Web3 = require('web3');
-const BN = require('bn.js');
 
+import { Web3Service } from './web3.service';
 @Injectable()
 export class SipcService {
-  private readonly sipc = new Web3(
-    new Web3.providers.HttpProvider('https://explorer.simplechain.com/rpc'),
-  );
   constructor(
+    private readonly web3Service: Web3Service,
     private readonly sipcBlcokService: SipcBlockService,
     private readonly sipcUncleService: SipcUncleService,
     private readonly sipcTransactionService: SipcTransactionService,
   ) {}
 
+  async getTransactionReceipt(hash: string) {
+    return await this.web3Service.sipc.eth.getTransactionReceipt(hash);
+  }
+
   async setProvider() {
     try {
-      await this.sipc.eth.net.isListening();
+      await this.web3Service.sipc.eth.net.isListening();
     } catch (e) {
       console.log(e);
       console.log(
         '[ - ] Lost connection to the node, reconnecting',
         'https://explorer.simplechain.com/rpc',
       );
-      await this.sipc.setProvider(
+      await this.web3Service.sipc.setProvider(
         new Web3.providers.HttpProvider('https://explorer.simplechain.com/rpc'),
       );
       await sleep(2000);
@@ -50,7 +52,7 @@ export class SipcService {
     if (blockNumber % 10 === 0) {
       console.log('Get block ', blockNumber);
     }
-    const currentHeight = await this.sipc.eth.getBlockNumber();
+    const currentHeight = await this.web3Service.sipc.eth.getBlockNumber();
 
     if (blockNumber > currentHeight) {
       //confirm 20 blocks;
@@ -59,7 +61,7 @@ export class SipcService {
       }, 1000);
       return false;
     }
-    const result = await this.sipc.eth.getBlock(blockNumber, true);
+    const result = await this.web3Service.sipc.eth.getBlock(blockNumber, true);
     if (R.isNil(result)) {
       return false;
     }
@@ -69,7 +71,7 @@ export class SipcService {
       try {
         const minerReward = reward * (1 - getFoundationPercent(result.number));
         const foundation = reward * getFoundationPercent(result.number);
-        const txnFees = this.getGasInBlock(result.transactions);
+        const txnFees = this.web3Service.getGasInBlock(result.transactions);
         const unclesCount = result.uncles.length;
         const uncleInclusionRewards = getRewardForUncle(
           result.number,
@@ -112,9 +114,14 @@ export class SipcService {
 
       try {
         if (result.uncles.length > 0) {
-          const count = await this.sipc.eth.getBlockUncleCount(blockNumber);
+          const count = await this.web3Service.sipc.eth.getBlockUncleCount(
+            blockNumber,
+          );
           for (let i = 0; i < count; i++) {
-            const uncle = await this.sipc.eth.getUncle(blockNumber, i);
+            const uncle = await this.web3Service.sipc.eth.getUncle(
+              blockNumber,
+              i,
+            );
             uncle.extraData === '0x' && (uncle.extraData = '0x0');
 
             const uncleReward = getUncleReward(
@@ -168,14 +175,17 @@ export class SipcService {
 
   async listenBlockTransactions(blockNumber) {
     try {
-      const currentHeight = await this.sipc.eth.getBlockNumber();
+      const currentHeight = await this.web3Service.sipc.eth.getBlockNumber();
       if (blockNumber > currentHeight) {
         setTimeout(async () => {
           await this.listenBlockTransactions(blockNumber);
         }, 1000);
         return false;
       }
-      const result = await this.sipc.eth.getBlock(blockNumber, true);
+      const result = await this.web3Service.sipc.eth.getBlock(
+        blockNumber,
+        true,
+      );
       if (R.isNil(result)) {
         return false;
       }
@@ -205,21 +215,5 @@ export class SipcService {
       console.log('getTransactions error:', blockNumber, e);
     }
     await this.listenBlockTransactions(blockNumber + 1);
-  }
-
-  getGasInBlock(transactions) {
-    let length = transactions.length;
-    if (length === 0) {
-      return 0;
-    }
-    let txsFee = 0;
-    for (let i = 0; i < length; i++) {
-      const bigFee = new BN(transactions[i].gas).mul(
-        new BN(transactions[i].gasPrice),
-      );
-      const fee = this.sipc.utils.fromWei(bigFee);
-      txsFee += parseFloat(fee);
-    }
-    return txsFee;
   }
 }
