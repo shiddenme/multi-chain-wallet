@@ -1,20 +1,21 @@
-import {
-    Controller,
-    Get,
-    Query
-} from '@nestjs/common';
+import { Controller, Get, Query, UseFilters } from '@nestjs/common';
 
-import { findTokenDto } from './dto/find_token.dto'
-import { SipcTokenService } from './token.service'
+import { SipcTokenService } from './token.service';
 
-@Controller('SIPC')
-export class SipcTokenController {
-    constructor(private readonly tokenService : SipcTokenService) {}
+import { HttpExceptionFilter } from '../../../core';
 
-    @Get('/token')
-    async findAll(@Query() query:findTokenDto) { 
-       return await this.tokenService.findAll(query) 
-    }
-   
+class findTokenDto {
+  contract: string;
+  symbol: string;
 }
 
+@Controller('sipc')
+export class SipcTokenController {
+  constructor(private readonly tokenService: SipcTokenService) {}
+
+  @Get('token')
+  @UseFilters(new HttpExceptionFilter())
+  async findAll(@Query() query: findTokenDto) {
+    return await this.tokenService.findAll(query);
+  }
+}

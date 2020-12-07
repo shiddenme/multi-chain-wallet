@@ -7,10 +7,7 @@ import { DatabaseModule } from '../../database/database.module';
 @Module({
   controllers: [SipcTransactionController],
   imports: [DatabaseModule],
-  providers: [
-    SipcTransactionService,
-    ...SipcTransactionProviders,
-  ],
-  exports:[SipcTransactionService]
+  providers: [SipcTransactionService, ...SipcTransactionProviders],
+  exports: [SipcTransactionService],
 })
 export class SipcTransactionModule {}
