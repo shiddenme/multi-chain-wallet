@@ -1,11 +1,11 @@
 import { Sequelize } from 'sequelize-typescript';
 import * as ethBLocks from '../ethereum/block/block.entity';
-import * as ethTransactions from '../ethereum/transaction/transaction.entity';
+import { Eth_Transaction } from '../ethereum/transaction/transaction.entity';
 import { Eth_Uncle } from '../ethereum/uncle/uncle.entity';
 import { Eth_Token } from '../ethereum/token/token.entity';
 
 import * as sipcBLocks from '../simplechain/block/block.entity';
-import * as sipcTransactions from '../simplechain/transaction/transaction.entity';
+import { SIPC_Transaction } from '../simplechain/transaction/transaction.entity';
 import { Sipc_Uncle } from '../simplechain/uncle/uncle.entity';
 import { Sipc_Token } from '../simplechain/token/token.entity';
 
@@ -27,14 +27,14 @@ export const databaseProviders = [
         Object.values(
           R.mergeAll([
             ethBLocks,
-            ethTransactions,
             sipcBLocks,
-            sipcTransactions,
             {
               Eth_Uncle,
               Eth_Token,
               Sipc_Uncle,
               Sipc_Token,
+              Eth_Transaction,
+              SIPC_Transaction,
             },
           ]),
         ),

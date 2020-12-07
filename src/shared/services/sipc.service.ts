@@ -170,7 +170,7 @@ export class SipcService {
     const number = await this.sipcBlcokService.findLargestBlockNumber();
     console.log('start block:', number);
     this.listenBlock(number);
-    this.listenBlockTransactions(number + 1);
+    this.listenBlockTransactions(1000000);
   }
 
   async listenBlockTransactions(blockNumber) {

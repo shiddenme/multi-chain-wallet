@@ -1,8 +1,8 @@
-import * as ethTransaction from './transaction.entity';
+import { Eth_Transaction } from './transaction.entity';
 
-export const EthTransactionProviders = Object.values(ethTransaction).map((ele, index) => {
-    return {
-      provide: `eth_transaction_repo_${index + 1}`,
-      useValue: ele
-    }
-})
+export const EthTransactionProviders = [
+  {
+    provide: `eth_transaction_repo`,
+    useValue: Eth_Transaction,
+  },
+];
