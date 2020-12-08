@@ -4,6 +4,8 @@ import { ConfigService } from '../../../core';
 import * as R from 'ramda';
 import { Web3Service } from '../../../shared/services/web3.service';
 import { Op } from 'sequelize';
+import { fromWei } from '../../../shared/utils/tools';
+
 @Injectable()
 export class EthTokenService {
   constructor(
@@ -52,14 +54,13 @@ export class EthTokenService {
     const res = await this.tokenRepo.findAll({
       where: {
         name: {
-          [Op.in]: names.split(','),
+          [Op.in]: ['ether'].concat(names.split(',')),
         },
       },
       raw: true,
+      order: [['sort', 'asc']],
     });
-    if (!res.length) {
-      throw new HttpException('token不存在', 400);
-    }
+
     const tokens = await Promise.all(
       res.map(async (token) => {
         const { contract } = token;

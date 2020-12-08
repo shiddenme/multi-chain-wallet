@@ -53,14 +53,13 @@ export class SipcTokenService {
     const res = await this.tokenRepo.findAll({
       where: {
         name: {
-          [Op.in]: names.split(','),
+          [Op.in]: ['sipc'].concat(names.split(',')),
         },
       },
       raw: true,
+      order: [['sort', 'asc']],
     });
-    if (!res.length) {
-      throw new HttpException('token不存在', 400);
-    }
+
     const tokens = await Promise.all(
       res.map(async (token) => {
         const { contract } = token;

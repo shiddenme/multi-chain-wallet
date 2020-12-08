@@ -18,7 +18,7 @@ import * as R from 'ramda';
 const Web3 = require('web3');
 const BN = require('bn.js');
 import { erc20AbI } from '../abi/erc20';
-
+import { fromWei } from '../utils/tools';
 @Injectable()
 export class Web3Service {
   private readonly web3 = new Web3(
@@ -38,7 +38,11 @@ export class Web3Service {
     private readonly config: ConfigService,
   ) {}
 
+  // 合约地址为空：查询主流币余额
   async myBalanceOf(contract, wallet, f: boolean = true) {
+    if (!contract) {
+      return fromWei(await this.web3.eth.getBalance(wallet), 'ether');
+    }
     const myContract = f ? this.web3Contract : this.sipcContract;
     myContract.options.address = contract;
 
