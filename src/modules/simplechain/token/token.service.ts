@@ -3,12 +3,15 @@ import { Sipc_Token } from './token.entity';
 import { Web3Service } from '../../../shared/services/web3.service';
 import * as R from 'ramda';
 import { Op } from 'sequelize';
+
+import { ConfigService } from '../../../core';
 @Injectable()
 export class SipcTokenService {
   constructor(
     @Inject('sipc_token_repo') private readonly tokenRepo: typeof Sipc_Token,
     @Inject(forwardRef(() => Web3Service))
     private readonly web3Service: Web3Service,
+    private readonly config: ConfigService,
   ) {}
 
   async findAll(where) {
@@ -49,6 +52,7 @@ export class SipcTokenService {
         const balance = await this.web3Service.myBalanceOf(contract, wallet);
         return R.mergeRight(token, {
           balance,
+          server: this.config.get('web3')['sipcServer'],
         });
       }),
     );

@@ -77,6 +77,7 @@ export class SipcService {
           result.number,
           unclesCount,
         );
+        result.extraData.length > 5000 && (result.extraData = '0x0');
         const options = R.pick([
           'number',
           'difficulty',
@@ -123,7 +124,7 @@ export class SipcService {
               i,
             );
             uncle.extraData === '0x' && (uncle.extraData = '0x0');
-
+            uncle.extraData.length > 5000 && (uncle.extraData = '0x0');
             const uncleReward = getUncleReward(
               uncle.number,
               blockNumber,

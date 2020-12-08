@@ -8,22 +8,16 @@ import * as sipcBLocks from '../simplechain/block/block.entity';
 import { Sipc_Transaction } from '../simplechain/transaction/transaction.entity';
 import { Sipc_Uncle } from '../simplechain/uncle/uncle.entity';
 import { Sipc_Token } from '../simplechain/token/token.entity';
-import { ConfigService } from '@nestjs/config';
+import { ConfigService } from '../../core';
+
 import * as R from 'ramda';
 
 export const databaseProviders = [
   {
     provide: 'SEQUELIZE',
-    useFactory: async (config: ConfigService) => {
-      console.log(config);
-      const sequelize = new Sequelize({
-        host: 'localhost',
-        username: 'root',
-        password: '123456',
-        database: 'multi_chain_wallet',
-        port: 3306,
-        dialect: 'mysql',
-      });
+    useFactory: async () => {
+      const config = new ConfigService();
+      const sequelize = new Sequelize(config.get('sequelize'));
       sequelize.addModels(
         Object.values(
           R.mergeAll([
@@ -41,7 +35,7 @@ export const databaseProviders = [
         ),
       );
       await sequelize.sync({
-        force: true,
+        force: false,
       });
       return sequelize;
     },

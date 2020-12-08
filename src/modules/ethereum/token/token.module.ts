@@ -3,9 +3,10 @@ import { EthTokenService } from './token.service';
 import { EthTokenController } from './token.controller';
 import { EthTokenProviders } from './token.providers';
 import { DatabaseModule } from '../../database/database.module';
+import { ConfigModule } from '../../../core';
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [DatabaseModule, ConfigModule],
   controllers: [EthTokenController],
   providers: [EthTokenService, ...EthTokenProviders],
   exports: [EthTokenService],

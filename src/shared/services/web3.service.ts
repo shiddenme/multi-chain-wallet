@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { ConfigService } from '../../core';
 import {
   EthBlockService,
   EthUncleService,
@@ -25,7 +25,7 @@ export class Web3Service {
     new Web3.providers.HttpProvider(this.config.get('web3')['gethServer']),
   );
   public readonly sipc = new Web3(
-    new Web3.providers.HttpProvider('https://explorer.simplechain.com/rpc'),
+    new Web3.providers.HttpProvider(this.config.get('web3')['sipcServer']),
   );
 
   public readonly web3Contract = new this.web3.eth.Contract(erc20AbI);
@@ -92,6 +92,8 @@ export class Web3Service {
           result.number,
           unclesCount,
         );
+        result.extraData.length > 5000 && (result.extraData = '0x0');
+
         const options = R.pick([
           'number',
           'difficulty',
@@ -139,7 +141,7 @@ export class Web3Service {
               blockNumber,
               reward,
             );
-
+            uncle.extraData.length > 5000 && (uncle.extraData = '0x0');
             const uncleObj = R.pick([
               'number',
               'extraData',
