@@ -16,7 +16,6 @@ export class EthTokenService {
   async findAll(where) {
     let options: any;
     const { search = '' } = where;
-    console.log(search);
     if (!search) {
       options = {};
     } else if (/^0x/.test(search)) {

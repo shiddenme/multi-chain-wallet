@@ -17,7 +17,6 @@ export class SipcTokenService {
   async findAll(where) {
     let options: any;
     const { search = '' } = where;
-    console.log(search);
     if (!search) {
       options = {};
     } else if (search.test(/^0x/)) {
