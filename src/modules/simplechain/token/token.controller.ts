@@ -14,8 +14,8 @@ class findAssetDto {
   @IsNotEmpty({ message: '钱包地址为空' })
   wallet: string;
 
-  @IsNotEmpty({ message: '合约地址为空' })
-  contracts: string;
+  @IsNotEmpty({ message: '名称为空' })
+  names: string;
 }
 
 @Controller('sipc')

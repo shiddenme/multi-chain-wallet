@@ -1,8 +1,8 @@
-import { Injectable, Inject, forwardRef } from '@nestjs/common';
+import { Injectable, Inject, forwardRef, HttpException } from '@nestjs/common';
 import { Sipc_Token } from './token.entity';
 import { Web3Service } from '../../../shared/services/web3.service';
 import * as R from 'ramda';
-
+import { Op } from 'sequelize';
 @Injectable()
 export class SipcTokenService {
   constructor(
@@ -31,15 +31,22 @@ export class SipcTokenService {
   }
 
   async findAsset(where) {
-    const { wallet, contracts } = where;
+    const { wallet, names } = where;
+    const res = await this.tokenRepo.findAll({
+      where: {
+        name: {
+          [Op.in]: names.split(','),
+        },
+      },
+      raw: true,
+    });
+    if (!res.length) {
+      throw new HttpException('token不存在', 400);
+    }
     const tokens = await Promise.all(
-      contracts.split(',').map(async (contract) => {
-        const token = await this.findOne({ contract });
-        const balance = await this.web3Service.myBalanceOf(
-          contract,
-          wallet,
-          false,
-        );
+      res.map(async (token) => {
+        const { contract } = token;
+        const balance = await this.web3Service.myBalanceOf(contract, wallet);
         return R.mergeRight(token, {
           balance,
         });

@@ -1,6 +1,6 @@
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { Eth_Transaction } from './transaction.entity';
-import { whickTransacionRepo } from '../../../shared/utils/tools';
+import { fromWei } from '../../../shared/utils/tools';
 
 import * as R from 'ramda';
 import { Op } from 'sequelize';
@@ -61,21 +61,13 @@ export class EthTransactionService {
     const res = await this.transactionRepo.findAll({
       where: options,
       attributes: {
-        exclude: ['gasUsed', 'status'],
+        exclude: ['gasUsed', 'status', 'input'],
       },
       raw: true,
     });
     const transactions = await Promise.all(
       res.map(async (transaction) => {
-        const {
-          hash,
-          blockNumber,
-          from,
-          to,
-          blockHash,
-          value,
-          input,
-        } = transaction;
+        const { hash, blockNumber, from, to, blockHash, value } = transaction;
 
         const transactionReceipt = await this.web3Service.getTransactionReceipt(
           hash.toString(),
@@ -102,8 +94,7 @@ export class EthTransactionService {
           hash: hash && hash.toString(),
           from: from && from.toString(),
           to: to && to.toString(),
-          value: value && value.toString(),
-          input: input && input.toString(),
+          value: fromWei(value && value.toString(), 'ether'),
         });
       }),
     );
