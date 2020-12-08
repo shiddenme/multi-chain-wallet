@@ -15,8 +15,24 @@ export class SipcTokenService {
   ) {}
 
   async findAll(where) {
+    let options: any;
+    const { search = '' } = where;
+    console.log(search);
+    if (!search) {
+      options = {};
+    } else if (search.test(/^0x/)) {
+      options = {
+        contract: search,
+      };
+    } else {
+      options = {
+        symbol: {
+          [Op.like]: `${search.toUpperCase()}%`,
+        },
+      };
+    }
     const tokens = await this.tokenRepo.findAll({
-      where: R.pick(['contract', 'symbol'])(where),
+      where: options,
       limit: 10,
       order: [['sort', 'asc']],
       raw: true,
@@ -56,6 +72,7 @@ export class SipcTokenService {
         });
       }),
     );
+
     return {
       wallet,
       tokens,

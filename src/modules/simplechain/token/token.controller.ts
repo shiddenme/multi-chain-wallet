@@ -6,8 +6,7 @@ import { HttpExceptionFilter } from '../../../core';
 
 import { IsNotEmpty } from 'class-validator';
 class findTokenDto {
-  contract: string;
-  symbol: string;
+  search: string;
 }
 
 class findAssetDto {
