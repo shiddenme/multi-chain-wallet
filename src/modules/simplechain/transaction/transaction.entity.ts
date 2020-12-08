@@ -8,7 +8,7 @@ import { Table, Column, Model, DataType } from 'sequelize-typescript';
   timestamps: false,
   freezeTableName: true,
 })
-export class SIPC_Transaction extends Model<SIPC_Transaction> {
+export class Sipc_Transaction extends Model<Sipc_Transaction> {
   @Column({
     type: 'varbinary(128)',
   })
@@ -30,10 +30,10 @@ export class SIPC_Transaction extends Model<SIPC_Transaction> {
   })
   public from: BinaryType;
 
-  @Column({ type: DataType.MEDIUMINT })
+  @Column({ type: DataType.BIGINT })
   public gas: number;
 
-  @Column({ type: DataType.MEDIUMINT })
+  @Column({ type: DataType.BIGINT })
   public gasUsed: number;
 
   @Column({ type: DataType.BIGINT })

@@ -5,7 +5,7 @@ import { Eth_Uncle } from '../ethereum/uncle/uncle.entity';
 import { Eth_Token } from '../ethereum/token/token.entity';
 
 import * as sipcBLocks from '../simplechain/block/block.entity';
-import { SIPC_Transaction } from '../simplechain/transaction/transaction.entity';
+import { Sipc_Transaction } from '../simplechain/transaction/transaction.entity';
 import { Sipc_Uncle } from '../simplechain/uncle/uncle.entity';
 import { Sipc_Token } from '../simplechain/token/token.entity';
 import { ConfigService } from '@nestjs/config';
@@ -35,13 +35,13 @@ export const databaseProviders = [
               Sipc_Uncle,
               Sipc_Token,
               Eth_Transaction,
-              SIPC_Transaction,
+              Sipc_Transaction,
             },
           ]),
         ),
       );
       await sequelize.sync({
-        force: false,
+        force: true,
       });
       return sequelize;
     },

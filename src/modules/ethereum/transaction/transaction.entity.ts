@@ -30,10 +30,10 @@ export class Eth_Transaction extends Model<Eth_Transaction> {
   })
   public from: BinaryType;
 
-  @Column({ type: DataType.MEDIUMINT })
+  @Column({ type: DataType.BIGINT })
   public gas: number;
 
-  @Column({ type: DataType.MEDIUMINT })
+  @Column({ type: DataType.BIGINT })
   public gasUsed: number;
 
   @Column({ type: DataType.BIGINT })
