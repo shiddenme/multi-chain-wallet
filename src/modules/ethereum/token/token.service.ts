@@ -4,7 +4,6 @@ import { ConfigService } from '../../../core';
 import * as R from 'ramda';
 import { Web3Service } from '../../../shared/services/web3.service';
 import { Op } from 'sequelize';
-import { fromWei } from '../../../shared/utils/tools';
 
 @Injectable()
 export class EthTokenService {
