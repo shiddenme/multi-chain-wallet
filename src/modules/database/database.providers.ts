@@ -8,17 +8,18 @@ import * as sipcBLocks from '../simplechain/block/block.entity';
 import { SIPC_Transaction } from '../simplechain/transaction/transaction.entity';
 import { Sipc_Uncle } from '../simplechain/uncle/uncle.entity';
 import { Sipc_Token } from '../simplechain/token/token.entity';
-
+import { ConfigService } from '@nestjs/config';
 import * as R from 'ramda';
 
 export const databaseProviders = [
   {
     provide: 'SEQUELIZE',
-    useFactory: async () => {
+    useFactory: async (config: ConfigService) => {
+      console.log(config);
       const sequelize = new Sequelize({
         host: 'localhost',
         username: 'root',
-        password: 'dataqin',
+        password: '123456',
         database: 'multi_chain_wallet',
         port: 3306,
         dialect: 'mysql',

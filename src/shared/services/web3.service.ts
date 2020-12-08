@@ -19,11 +19,6 @@ const Web3 = require('web3');
 const BN = require('bn.js');
 import { erc20AbI } from '../abi/erc20';
 
-enum server {
-  ethereum,
-  simplechain,
-}
-
 @Injectable()
 export class Web3Service {
   private readonly web3 = new Web3(

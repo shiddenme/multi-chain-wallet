@@ -3,8 +3,6 @@ import { ConfigModule } from '@nestjs/config';
 import loadConfig from './config/load-config';
 import validationSchema from './config/env-schema';
 
-
-
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -14,7 +12,6 @@ import validationSchema from './config/env-schema';
       load: loadConfig,
       validationSchema,
     }),
-
   ],
 })
 export class CoreModule {}
