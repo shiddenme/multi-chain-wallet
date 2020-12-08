@@ -1,5 +1,5 @@
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
-import { SIPC_Transaction } from './transaction.entity';
+import { Sipc_Transaction } from './transaction.entity';
 import * as R from 'ramda';
 import { Op } from 'sequelize';
 import { Web3Service } from '../../../shared/services/web3.service';
@@ -14,7 +14,7 @@ export class SipcTransactionService {
     private readonly blockService: SipcBlockService,
     private readonly tokenService: SipcTokenService,
     @Inject('sipc_transaction_repo')
-    private readonly transactionRepo: typeof SIPC_Transaction,
+    private readonly transactionRepo: typeof Sipc_Transaction,
   ) {}
 
   // todo: 为插入选项options 创建 DTO
