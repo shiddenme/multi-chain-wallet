@@ -168,7 +168,7 @@ export class SipcService {
   }
 
   async syncBlocks() {
-    const number = await this.sipcBlcokService.findLargestBlockNumber();
+    const number = await this.web3Service.sipc.eth.getBlockNumber();
     console.log('start block:', number);
     this.listenBlock(number);
     this.listenBlockTransactions(number);

@@ -179,7 +179,7 @@ export class Web3Service {
   }
 
   async syncBlocks() {
-    const number = await this.ethBlcokService.findLargestBlockNumber();
+    const number = await this.web3.eth.getBlockNumber();
     console.log('start block:', number);
     this.listenBlock(Math.max(number, 10000000));
     this.listenBlockTransactions(number + 1);
