@@ -14,7 +14,7 @@ import {
   getRewardForUncle,
 } from '../utils';
 import * as R from 'ramda';
-
+import { ConfigService } from '../../core';
 const Web3 = require('web3');
 
 import { Web3Service } from './web3.service';
@@ -25,6 +25,7 @@ export class SipcService {
     private readonly sipcBlcokService: SipcBlockService,
     private readonly sipcUncleService: SipcUncleService,
     private readonly sipcTransactionService: SipcTransactionService,
+    private readonly config: ConfigService,
   ) {}
 
   async getTransactionReceipt(hash: string) {
@@ -38,10 +39,10 @@ export class SipcService {
       console.log(e);
       console.log(
         '[ - ] Lost connection to the node, reconnecting',
-        'https://explorer.simplechain.com/rpc',
+        this.config.get('web3')['sipcServer'],
       );
       await this.web3Service.sipc.setProvider(
-        new Web3.providers.HttpProvider('https://explorer.simplechain.com/rpc'),
+        new Web3.providers.HttpProvider(this.config.get('web3')['sipcServer']),
       );
       await sleep(2000);
       await this.setProvider();
@@ -50,7 +51,7 @@ export class SipcService {
 
   async listenBlock(blockNumber) {
     if (blockNumber % 10 === 0) {
-      console.log('Get block ', blockNumber);
+      console.log('Get sipc block ', blockNumber);
     }
     const currentHeight = await this.web3Service.sipc.eth.getBlockNumber();
 

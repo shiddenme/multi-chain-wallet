@@ -1,5 +1,6 @@
 import { Module, Global } from '@nestjs/common';
 import { SipcService } from './sipc.service';
+import { ConfigModule } from '../../core';
 import {
   SipcBlockModule,
   SipcTransactionModule,
@@ -16,6 +17,7 @@ import { Web3Module } from './web3.module';
     SipcUncleModule,
     SipcTokenModule,
     Web3Module,
+    ConfigModule,
   ],
   providers: [SipcService],
   exports: [SipcService],

@@ -69,7 +69,7 @@ export class Web3Service {
 
   async listenBlock(blockNumber) {
     if (blockNumber % 10 === 0) {
-      console.log('Get block ', blockNumber);
+      console.log('Get eth block ', blockNumber);
     }
     const currentHeight = await this.web3.eth.getBlockNumber();
 
