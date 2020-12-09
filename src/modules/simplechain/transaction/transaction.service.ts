@@ -74,10 +74,11 @@ export class SipcTransactionService {
           value,
           input,
         } = transaction;
-
         const transactionReceipt = await this.web3Service.getTransactionReceipt(
           hash.toString(),
+          false,
         );
+
         const date = await this.blockService.findBlockTimeStamp(blockNumber);
         const token = await this.tokenService.findOne({
           contract: to.toString(),

@@ -182,6 +182,7 @@ export class SipcService {
         blockNumber,
         true,
       );
+      const timestamp = result.timestamp;
       if (R.isNil(result)) {
         return false;
       }
@@ -191,6 +192,7 @@ export class SipcService {
 
         (transaction.input === '0x' || transaction.input.length > 50000) &&
           (transaction.input = '0x0');
+        transaction.timestamp = timestamp;
         const transactionObj = R.pick([
           'blockHash',
           'blockNumber',
@@ -203,6 +205,7 @@ export class SipcService {
           'to',
           'transactionIndex',
           'value',
+          'timestamp',
         ])(transaction);
         queue.push(this.sipcTransactionService.findOrCreate(transactionObj));
       }

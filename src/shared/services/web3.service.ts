@@ -195,12 +195,14 @@ export class Web3Service {
       if (R.isNil(result)) {
         return false;
       }
+      const timestamp = result.timestamp;
       const queue = [];
       for (let i = 0; i < result.transactions.length; i++) {
         const transaction = result.transactions[i];
 
         (transaction.input === '0x' || transaction.input.length > 50000) &&
           (transaction.input = '0x0');
+        transaction.timestamp = timestamp;
         const transactionObj = R.pick([
           'blockHash',
           'blockNumber',
@@ -213,6 +215,7 @@ export class Web3Service {
           'to',
           'transactionIndex',
           'value',
+          'timestamp',
         ])(transaction);
         queue.push(this.ethTransactionService.findOrCreate(transactionObj));
       }

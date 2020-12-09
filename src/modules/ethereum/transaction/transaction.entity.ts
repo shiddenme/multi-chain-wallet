@@ -54,6 +54,6 @@ export class Eth_Transaction extends Model<Eth_Transaction> {
   @Column({ type: 'varbinary(32)' })
   public value: BinaryType;
 
-  @Column({ type: 'varchar(10)' })
-  public status: string;
+  @Column({ type: DataType.BIGINT })
+  public timestamp: number;
 }
