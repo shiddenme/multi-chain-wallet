@@ -63,7 +63,11 @@ export class EthTokenService {
     const tokens = await Promise.all(
       res.map(async (token) => {
         const { contract } = token;
-        const balance = await this.web3Service.myBalanceOf(contract, wallet);
+        const balance = await this.web3Service.myBalanceOf(
+          contract,
+          wallet,
+          true,
+        );
         return R.mergeRight(token, {
           balance,
           server: this.config.get('web3')['gethServer'],

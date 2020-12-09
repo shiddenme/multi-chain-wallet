@@ -39,7 +39,7 @@ export class Web3Service {
   ) {}
 
   // 合约地址为空：查询主流币余额
-  async myBalanceOf(contract, wallet, f: boolean = true) {
+  async myBalanceOf(contract, wallet, f: boolean) {
     if (!contract) {
       const server = f ? this.web3 : this.sipc;
       const value = await server.eth.getBalance(wallet);
@@ -51,7 +51,7 @@ export class Web3Service {
     return await myContract.methods.balanceOf(wallet).call();
   }
 
-  async getTransactionReceipt(hash: string, f: boolean = true) {
+  async getTransactionReceipt(hash: string, f: boolean) {
     const link = f ? this.web3 : this.sipc;
     return await link.eth.getTransactionReceipt(hash);
   }

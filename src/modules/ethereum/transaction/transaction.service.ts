@@ -5,15 +5,13 @@ import { fromWei } from '../../../shared/utils/tools';
 import * as R from 'ramda';
 import { Op } from 'sequelize';
 import { Web3Service } from '../../../shared/services/web3.service';
-import { EthBlockService } from '../block/block.service';
 import { EthTokenService } from '../token/token.service';
-
+import * as moment from 'moment';
 @Injectable()
 export class EthTransactionService {
   constructor(
     @Inject(forwardRef(() => Web3Service))
     private readonly web3Service: Web3Service,
-    private readonly blockService: EthBlockService,
     private readonly tokenService: EthTokenService,
     @Inject('eth_transaction_repo')
     private readonly transactionRepo: typeof Eth_Transaction,
@@ -42,7 +40,7 @@ export class EthTransactionService {
   }
 
   async findAll(where) {
-    const { wallet, search } = where;
+    const { wallet, search, pageIndex = 0, pageSize = 10 } = where;
     let options: any;
     if (search === 'from') {
       options = {
@@ -58,29 +56,35 @@ export class EthTransactionService {
       };
     }
 
-    const res = await this.transactionRepo.findAll({
+    const res = await this.transactionRepo.findAndCountAll({
       where: options,
       attributes: {
         exclude: ['gasUsed', 'status'],
       },
       raw: true,
+      order: [['timestamp', 'desc']],
+      limit: pageSize,
+      offset: pageIndex * pageSize,
     });
+    const { rows, count } = res;
     const transactions = await Promise.all(
-      res.map(async (transaction) => {
+      rows.map(async (transaction) => {
         const {
           hash,
-          blockNumber,
           from,
           to,
           blockHash,
           value,
           input,
+          timestamp,
         } = transaction;
-
         const transactionReceipt = await this.web3Service.getTransactionReceipt(
           hash.toString(),
+          true,
         );
-        const date = await this.blockService.findBlockTimeStamp(blockNumber);
+        const date = timestamp
+          ? moment(timestamp * 1000).format('YYYY-MM-DD hh:mm:ss')
+          : '';
         const token = await this.tokenService.findOne({
           contract: to.toString(),
         });
@@ -110,6 +114,7 @@ export class EthTransactionService {
 
     return {
       transactions,
+      count,
     };
   }
 }

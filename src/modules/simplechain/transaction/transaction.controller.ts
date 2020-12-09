@@ -7,9 +7,11 @@ import { IsNotEmpty } from 'class-validator';
 class findTransactionDto {
   @IsNotEmpty({ message: '钱包地址为空' })
   wallet: string;
-  search: string;
-}
 
+  search: string;
+  pageIndex: number;
+  pageSize: number;
+}
 @Controller('sipc')
 export class SipcTransactionController {
   constructor(private readonly transactionService: SipcTransactionService) {}

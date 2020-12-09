@@ -5,7 +5,7 @@ import { Op } from 'sequelize';
 import { Web3Service } from '../../../shared/services/web3.service';
 import { SipcBlockService } from '../block/block.service';
 import { SipcTokenService } from '../token/token.service';
-
+import * as moment from 'moment';
 @Injectable()
 export class SipcTransactionService {
   constructor(
@@ -40,7 +40,7 @@ export class SipcTransactionService {
   }
 
   async findAll(where) {
-    const { wallet, search } = where;
+    const { wallet, search, pageIndex = 0, pageSize = 10 } = where;
     let options: any;
     if (search === 'from') {
       options = {
@@ -56,34 +56,39 @@ export class SipcTransactionService {
       };
     }
 
-    const res = await this.transactionRepo.findAll({
+    const res = await this.transactionRepo.findAndCountAll({
       where: options,
       attributes: {
         exclude: ['gasUsed', 'status'],
       },
       raw: true,
+      order: [['timestamp', 'desc']],
+      limit: pageSize,
+      offset: pageIndex * pageSize,
     });
+    const { rows, count } = res;
     const transactions = await Promise.all(
-      res.map(async (transaction) => {
+      rows.map(async (transaction) => {
         const {
           hash,
-          blockNumber,
           from,
           to,
           blockHash,
           value,
           input,
+          timestamp,
         } = transaction;
         const transactionReceipt = await this.web3Service.getTransactionReceipt(
           hash.toString(),
           false,
         );
-
-        const date = await this.blockService.findBlockTimeStamp(blockNumber);
+        const date = timestamp
+          ? moment(timestamp * 1000).format('YYYY-MM-DD hh:mm:ss')
+          : '';
         const token = await this.tokenService.findOne({
           contract: to.toString(),
         });
-        const symbol = token ? token.symbol : 'ETH';
+        const symbol = token ? token.symbol : 'SIPC';
 
         let mark: number = 1;
         if (from.toString() === wallet) {
@@ -99,16 +104,17 @@ export class SipcTransactionService {
           mark,
           blockHash: blockHash && blockHash.toString(),
           hash: hash && hash.toString(),
+          input: input && input.toString(),
           from: from && from.toString(),
           to: to && to.toString(),
-          value: value && value.toString(),
-          input: input && input.toString(),
+          value: value.toString(),
         });
       }),
     );
 
     return {
       transactions,
+      count,
     };
   }
 }
