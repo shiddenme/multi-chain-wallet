@@ -63,8 +63,8 @@ export class EthTransactionService {
       },
       raw: true,
       order: [['timestamp', 'desc']],
-      limit: pageSize,
-      offset: pageIndex * pageSize,
+      limit: Number(pageSize),
+      offset: Number(pageIndex) * Number(pageSize),
     });
     const { rows, count } = res;
     const transactions = await Promise.all(
