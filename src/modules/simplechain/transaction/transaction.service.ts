@@ -40,7 +40,9 @@ export class SipcTransactionService {
   }
 
   async findAll(where) {
-    const { wallet, search, pageIndex = 0, pageSize = 10 } = where;
+    const { wallet, search, pageIndex = 1, pageSize = 10 } = where;
+    const limit = Number(pageSize);
+    const offset = pageIndex < 1 ? 0 : Number(pageIndex - 1) * Number(pageSize);
     let options: any;
     if (search === 'from') {
       options = {
@@ -63,8 +65,8 @@ export class SipcTransactionService {
       },
       raw: true,
       order: [['timestamp', 'desc']],
-      limit: Number(pageSize),
-      offset: Number(pageIndex) * Number(pageSize),
+      limit,
+      offset,
     });
     const { rows, count } = res;
     const transactions = await Promise.all(
