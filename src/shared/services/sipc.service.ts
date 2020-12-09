@@ -44,126 +44,120 @@ export class SipcService {
       await this.web3Service.sipc.setProvider(
         new Web3.providers.HttpProvider(this.config.get('web3')['sipcServer']),
       );
-      await sleep(2000);
+      await sleep(this.config.get('web3')['reconnect']);
       await this.setProvider();
     }
   }
 
   async listenBlock(blockNumber) {
-    if (blockNumber % 10 === 0) {
-      console.log('Get sipc block ', blockNumber);
-    }
-    const currentHeight = await this.web3Service.sipc.eth.getBlockNumber();
-
-    if (blockNumber > currentHeight) {
-      //confirm 20 blocks;
-      setTimeout(async () => {
-        await this.listenBlock(blockNumber - 12);
-      }, 1000);
-      return false;
-    }
-    const result = await this.web3Service.sipc.eth.getBlock(blockNumber, true);
-    if (R.isNil(result)) {
-      return false;
-    }
     try {
-      result.extraData === '0x' && (result.extraData = '0x0');
-      const reward = getConstReward(result.number);
-      try {
-        const minerReward = reward * (1 - getFoundationPercent(result.number));
-        const foundation = reward * getFoundationPercent(result.number);
-        const txnFees = this.web3Service.getGasInBlock(result.transactions);
-        const unclesCount = result.uncles.length;
-        const uncleInclusionRewards = getRewardForUncle(
-          result.number,
-          unclesCount,
-        );
-        result.extraData.length > 5000 && (result.extraData = '0x0');
-        const options = R.pick([
-          'number',
-          'difficulty',
-          'extraData',
-          'gasLimit',
-          'gasUsed',
-          'hash',
-          'logsBloom',
-          'miner',
-          'mixHash',
-          'nonce',
-          'parentHash',
-          'receiptsRoot',
-          'sha3Uncles',
-          'size',
-          'stateRoot',
-          'totalDifficulty',
-          'timestamp',
-          'transactionsRoot',
-        ])(result);
+      if (blockNumber % 10 === 0) {
+        console.log('Get sipc block ', blockNumber);
+      }
+      const currentHeight = await this.web3Service.sipc.eth.getBlockNumber();
 
-        await this.sipcBlcokService.findOrCreate(
-          R.mergeRight(options, {
-            unclesCount,
-            minerReward,
-            foundation,
-            txnFees,
-            uncleInclusionRewards,
-          }),
-        );
-        // await setHashRate(result.number, result.timestamp)
-      } catch (e) {
-        console.log('save block error:', blockNumber, e);
+      if (blockNumber > currentHeight) {
+        //confirm 20 blocks;
+        setTimeout(async () => {
+          await this.listenBlock(blockNumber - 12);
+        }, 1000);
+        return false;
+      }
+      const result = await this.web3Service.sipc.eth.getBlock(
+        blockNumber,
+        true,
+      );
+      if (R.isNil(result)) {
+        return false;
       }
 
-      try {
-        if (result.uncles.length > 0) {
-          const count = await this.web3Service.sipc.eth.getBlockUncleCount(
-            blockNumber,
-          );
-          for (let i = 0; i < count; i++) {
-            const uncle = await this.web3Service.sipc.eth.getUncle(
-              blockNumber,
-              i,
-            );
-            uncle.extraData === '0x' && (uncle.extraData = '0x0');
-            uncle.extraData.length > 5000 && (uncle.extraData = '0x0');
-            const uncleReward = getUncleReward(
-              uncle.number,
-              blockNumber,
-              reward,
-            );
+      result.extraData === '0x' && (result.extraData = '0x0');
+      const reward = getConstReward(result.number);
 
-            const uncleObj = R.pick([
-              'number',
-              'extraData',
-              'gasLimit',
-              'gasUsed',
-              'hash',
-              'logsBloom',
-              'miner',
-              'mixHash',
-              'nonce',
-              'parentHash',
-              'receiptsRoot',
-              'sha3Uncles',
-              'size',
-              'stateRoot',
-              'timestamp',
-              'transactionsRoot',
-            ])(uncle);
-            await this.sipcUncleService.findOrCreate(
-              R.mergeRight(uncleObj, {
-                blockNumber,
-                uncleIndex: i,
-                reward: uncleReward,
-              }),
-            );
-          }
+      const minerReward = reward * (1 - getFoundationPercent(result.number));
+      const foundation = reward * getFoundationPercent(result.number);
+      const txnFees = this.web3Service.getGasInBlock(result.transactions);
+      const unclesCount = result.uncles.length;
+      const uncleInclusionRewards = getRewardForUncle(
+        result.number,
+        unclesCount,
+      );
+      result.extraData.length > 5000 && (result.extraData = '0x0');
+      const options = R.pick([
+        'number',
+        'difficulty',
+        'extraData',
+        'gasLimit',
+        'gasUsed',
+        'hash',
+        'logsBloom',
+        'miner',
+        'mixHash',
+        'nonce',
+        'parentHash',
+        'receiptsRoot',
+        'sha3Uncles',
+        'size',
+        'stateRoot',
+        'totalDifficulty',
+        'timestamp',
+        'transactionsRoot',
+      ])(result);
+
+      await this.sipcBlcokService.findOrCreate(
+        R.mergeRight(options, {
+          unclesCount,
+          minerReward,
+          foundation,
+          txnFees,
+          uncleInclusionRewards,
+        }),
+      );
+      // await setHashRate(result.number, result.timestamp)
+
+      if (result.uncles.length > 0) {
+        const count = await this.web3Service.sipc.eth.getBlockUncleCount(
+          blockNumber,
+        );
+        for (let i = 0; i < count; i++) {
+          const uncle = await this.web3Service.sipc.eth.getUncle(
+            blockNumber,
+            i,
+          );
+          uncle.extraData === '0x' && (uncle.extraData = '0x0');
+          uncle.extraData.length > 5000 && (uncle.extraData = '0x0');
+          const uncleReward = getUncleReward(uncle.number, blockNumber, reward);
+
+          const uncleObj = R.pick([
+            'number',
+            'extraData',
+            'gasLimit',
+            'gasUsed',
+            'hash',
+            'logsBloom',
+            'miner',
+            'mixHash',
+            'nonce',
+            'parentHash',
+            'receiptsRoot',
+            'sha3Uncles',
+            'size',
+            'stateRoot',
+            'timestamp',
+            'transactionsRoot',
+          ])(uncle);
+          await this.sipcUncleService.findOrCreate(
+            R.mergeRight(uncleObj, {
+              blockNumber,
+              uncleIndex: i,
+              reward: uncleReward,
+            }),
+          );
         }
-      } catch (e) {
-        console.log('getBlockUncleCount error:', blockNumber, e);
       }
     } catch (e) {
       console.log('getBlock error:', blockNumber, e);
+      blockNumber--;
     }
     await this.listenBlock(blockNumber + 1);
   }
@@ -215,6 +209,7 @@ export class SipcService {
       await Promise.all(queue);
     } catch (e) {
       console.log('getTransactions error:', blockNumber, e);
+      blockNumber--;
     }
     await this.listenBlockTransactions(blockNumber + 1);
   }

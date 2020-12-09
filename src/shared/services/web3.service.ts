@@ -62,122 +62,113 @@ export class Web3Service {
       console.log(e);
       console.log('[ - ] Lost connection to the node, reconnecting', url);
       await this.web3.setProvider(new Web3.providers.HttpProvider(url));
-      await sleep(2000);
+      await sleep(this.config.get('web3')['reconnect']);
       await this.setProvider(url);
     }
   }
 
   async listenBlock(blockNumber) {
-    if (blockNumber % 10 === 0) {
-      console.log('Get eth block ', blockNumber);
-    }
-    const currentHeight = await this.web3.eth.getBlockNumber();
-
-    if (blockNumber > currentHeight) {
-      //confirm 20 blocks;
-      setTimeout(async () => {
-        await this.listenBlock(blockNumber - 12);
-      }, 1000);
-      return false;
-    }
-    const result = await this.web3.eth.getBlock(blockNumber, true);
-    if (R.isNil(result)) {
-      return false;
-    }
     try {
-      result.extraData === '0x' && (result.extraData = '0x0');
-      const reward = getConstReward(result.number);
-      try {
-        const minerReward = reward * (1 - getFoundationPercent(result.number));
-        const foundation = reward * getFoundationPercent(result.number);
-        const txnFees = this.getGasInBlock(result.transactions);
-        const unclesCount = result.uncles.length;
-        const uncleInclusionRewards = getRewardForUncle(
-          result.number,
-          unclesCount,
-        );
-        result.extraData.length > 5000 && (result.extraData = '0x0');
+      if (blockNumber % 10 === 0) {
+        console.log('Get eth block ', blockNumber);
+      }
+      const currentHeight = await this.web3.eth.getBlockNumber();
 
-        const options = R.pick([
-          'number',
-          'difficulty',
-          'extraData',
-          'gasLimit',
-          'gasUsed',
-          'hash',
-          'logsBloom',
-          'miner',
-          'mixHash',
-          'nonce',
-          'parentHash',
-          'receiptsRoot',
-          'sha3Uncles',
-          'size',
-          'stateRoot',
-          'totalDifficulty',
-          'timestamp',
-          'transactionsRoot',
-        ])(result);
-
-        await this.ethBlcokService.findOrCreate(
-          R.mergeRight(options, {
-            unclesCount,
-            minerReward,
-            foundation,
-            txnFees,
-            uncleInclusionRewards,
-          }),
-        );
-        // await setHashRate(result.number, result.timestamp)
-      } catch (e) {
-        console.log('save block error:', blockNumber, e);
+      if (blockNumber > currentHeight) {
+        //confirm 20 blocks;
+        setTimeout(async () => {
+          await this.listenBlock(blockNumber - 12);
+        }, 1000);
+        return false;
+      }
+      const result = await this.web3.eth.getBlock(blockNumber, true);
+      if (R.isNil(result)) {
+        return false;
       }
 
-      try {
-        if (result.uncles.length > 0) {
-          const count = await this.web3.eth.getBlockUncleCount(blockNumber);
-          for (let i = 0; i < count; i++) {
-            const uncle = await this.web3.eth.getUncle(blockNumber, i);
-            uncle.extraData === '0x' && (uncle.extraData = '0x0');
+      result.extraData === '0x' && (result.extraData = '0x0');
+      const reward = getConstReward(result.number);
 
-            const uncleReward = getUncleReward(
-              uncle.number,
+      const minerReward = reward * (1 - getFoundationPercent(result.number));
+      const foundation = reward * getFoundationPercent(result.number);
+      const txnFees = this.getGasInBlock(result.transactions);
+      const unclesCount = result.uncles.length;
+      const uncleInclusionRewards = getRewardForUncle(
+        result.number,
+        unclesCount,
+      );
+      result.extraData.length > 5000 && (result.extraData = '0x0');
+
+      const options = R.pick([
+        'number',
+        'difficulty',
+        'extraData',
+        'gasLimit',
+        'gasUsed',
+        'hash',
+        'logsBloom',
+        'miner',
+        'mixHash',
+        'nonce',
+        'parentHash',
+        'receiptsRoot',
+        'sha3Uncles',
+        'size',
+        'stateRoot',
+        'totalDifficulty',
+        'timestamp',
+        'transactionsRoot',
+      ])(result);
+
+      await this.ethBlcokService.findOrCreate(
+        R.mergeRight(options, {
+          unclesCount,
+          minerReward,
+          foundation,
+          txnFees,
+          uncleInclusionRewards,
+        }),
+      );
+      // await setHashRate(result.number, result.timestamp)
+
+      if (result.uncles.length > 0) {
+        const count = await this.web3.eth.getBlockUncleCount(blockNumber);
+        for (let i = 0; i < count; i++) {
+          const uncle = await this.web3.eth.getUncle(blockNumber, i);
+          uncle.extraData === '0x' && (uncle.extraData = '0x0');
+
+          const uncleReward = getUncleReward(uncle.number, blockNumber, reward);
+          uncle.extraData.length > 5000 && (uncle.extraData = '0x0');
+          const uncleObj = R.pick([
+            'number',
+            'extraData',
+            'gasLimit',
+            'gasUsed',
+            'hash',
+            'logsBloom',
+            'miner',
+            'mixHash',
+            'nonce',
+            'parentHash',
+            'receiptsRoot',
+            'sha3Uncles',
+            'size',
+            'stateRoot',
+            'timestamp',
+            'transactionsRoot',
+          ])(uncle);
+          await this.ethUncleService.findOrCreate(
+            R.mergeRight(uncleObj, {
               blockNumber,
-              reward,
-            );
-            uncle.extraData.length > 5000 && (uncle.extraData = '0x0');
-            const uncleObj = R.pick([
-              'number',
-              'extraData',
-              'gasLimit',
-              'gasUsed',
-              'hash',
-              'logsBloom',
-              'miner',
-              'mixHash',
-              'nonce',
-              'parentHash',
-              'receiptsRoot',
-              'sha3Uncles',
-              'size',
-              'stateRoot',
-              'timestamp',
-              'transactionsRoot',
-            ])(uncle);
-            await this.ethUncleService.findOrCreate(
-              R.mergeRight(uncleObj, {
-                blockNumber,
-                uncleIndex: i,
-                reward: uncleReward,
-              }),
-            );
-          }
+              uncleIndex: i,
+              reward: uncleReward,
+            }),
+          );
         }
-      } catch (e) {
-        console.log('getBlockUncleCount error:', blockNumber, e);
       }
     } catch (e) {
       console.log('getBlock error:', blockNumber, e);
+      blockNumber--;
     }
     await this.listenBlock(blockNumber + 1);
   }
@@ -226,6 +217,7 @@ export class Web3Service {
       await Promise.all(queue);
     } catch (e) {
       console.log('getTransactions error:', blockNumber, e);
+      blockNumber--;
     }
     await this.listenBlockTransactions(blockNumber + 1);
   }
