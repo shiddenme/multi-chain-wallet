@@ -76,7 +76,7 @@ export class Web3Service {
     if (blockNumber > currentHeight) {
       //confirm 20 blocks;
       setTimeout(async () => {
-        await this.listenBlock(blockNumber);
+        await this.listenBlock(blockNumber - 12);
       }, 1000);
       return false;
     }
