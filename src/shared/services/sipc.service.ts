@@ -50,14 +50,14 @@ export class SipcService {
 
   async listenBlock(blockNumber) {
     if (blockNumber % 10 === 0) {
-      console.log('Get block ', blockNumber - 12);
+      console.log('Get block ', blockNumber);
     }
     const currentHeight = await this.web3Service.sipc.eth.getBlockNumber();
 
     if (blockNumber > currentHeight) {
       //confirm 20 blocks;
       setTimeout(async () => {
-        await this.listenBlock(blockNumber);
+        await this.listenBlock(blockNumber - 12);
       }, 1000);
       return false;
     }
