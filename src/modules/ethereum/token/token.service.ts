@@ -53,7 +53,7 @@ export class EthTokenService {
     const res = await this.tokenRepo.findAll({
       where: {
         name: {
-          [Op.in]: ['ether'].concat(names.split(',')),
+          [Op.in]: ['Ethereum'].concat(names.split(',')),
         },
       },
       raw: true,

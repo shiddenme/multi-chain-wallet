@@ -57,7 +57,7 @@ export class SipcTokenService {
     const res = await this.tokenRepo.findAll({
       where: {
         name: {
-          [Op.in]: ['sipc'].concat(names.split(',')),
+          [Op.in]: ['SimpleChain'].concat(names.split(',')),
         },
       },
       raw: true,
