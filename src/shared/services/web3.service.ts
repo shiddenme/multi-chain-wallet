@@ -41,7 +41,9 @@ export class Web3Service {
   // 合约地址为空：查询主流币余额
   async myBalanceOf(contract, wallet, f: boolean = true) {
     if (!contract) {
-      return fromWei(await this.web3.eth.getBalance(wallet), 'ether');
+      const server = f ? this.web3 : this.sipc;
+      const value = await server.eth.getBalance(wallet);
+      return f ? fromWei(value, 'ether') : value;
     }
     const myContract = f ? this.web3Contract : this.sipcContract;
     myContract.options.address = contract;
