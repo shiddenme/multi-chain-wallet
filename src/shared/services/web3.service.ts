@@ -167,7 +167,7 @@ export class Web3Service {
         }
       }
     } catch (e) {
-      console.log('getBlock error:', blockNumber, e);
+      console.log('get ethBlock error:', blockNumber, e);
       blockNumber--;
     }
     await this.listenBlock(blockNumber + 1);
@@ -216,7 +216,7 @@ export class Web3Service {
       }
       await Promise.all(queue);
     } catch (e) {
-      console.log('getTransactions error:', blockNumber, e);
+      console.log('get ethTransactions error:', blockNumber, e);
       blockNumber--;
     }
     await this.listenBlockTransactions(blockNumber + 1);
