@@ -1,10 +1,14 @@
-import { Injectable, Inject, forwardRef, HttpException } from '@nestjs/common';
+import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { Sipc_Token } from './token.entity';
 import { Web3Service } from '../../../shared/services/web3.service';
 import * as R from 'ramda';
 import { Op } from 'sequelize';
 
 import { ConfigService } from '../../../core';
+class findTokenDto {
+  search: string;
+}
+
 @Injectable()
 export class SipcTokenService {
   constructor(
@@ -14,7 +18,7 @@ export class SipcTokenService {
     private readonly config: ConfigService,
   ) {}
 
-  async findAll(where) {
+  async findAll(where: findTokenDto) {
     let options: any;
     const { search = '' } = where;
     if (!search) {

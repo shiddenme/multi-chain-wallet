@@ -61,13 +61,21 @@ export class EthTransactionService {
     const res = await this.transactionRepo.findAll({
       where: options,
       attributes: {
-        exclude: ['gasUsed', 'status', 'input'],
+        exclude: ['gasUsed', 'status'],
       },
       raw: true,
     });
     const transactions = await Promise.all(
       res.map(async (transaction) => {
-        const { hash, blockNumber, from, to, blockHash, value } = transaction;
+        const {
+          hash,
+          blockNumber,
+          from,
+          to,
+          blockHash,
+          value,
+          input,
+        } = transaction;
 
         const transactionReceipt = await this.web3Service.getTransactionReceipt(
           hash.toString(),
@@ -92,6 +100,7 @@ export class EthTransactionService {
           mark,
           blockHash: blockHash && blockHash.toString(),
           hash: hash && hash.toString(),
+          input: input && input.toString(),
           from: from && from.toString(),
           to: to && to.toString(),
           value: fromWei(value && value.toString(), 'ether'),
