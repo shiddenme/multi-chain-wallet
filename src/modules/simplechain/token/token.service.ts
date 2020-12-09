@@ -47,7 +47,7 @@ export class SipcTokenService {
 
   async findOne(where) {
     return await this.tokenRepo.findOne({
-      where: R.pick(['contract', 'symbol'])(where),
+      where: R.pick(['contract', 'symbol', 'name'])(where),
       raw: true,
     });
   }

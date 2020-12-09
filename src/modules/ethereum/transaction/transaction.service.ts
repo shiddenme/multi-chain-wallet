@@ -1,4 +1,4 @@
-import { Injectable, Inject, forwardRef } from '@nestjs/common';
+import { Injectable, Inject, forwardRef, HttpException } from '@nestjs/common';
 import { Eth_Transaction } from './transaction.entity';
 import { fromWei } from '../../../shared/utils/tools';
 
@@ -40,7 +40,25 @@ export class EthTransactionService {
   }
 
   async findAll(where) {
-    const { wallet, search, pageIndex = 1, pageSize = 10 } = where;
+    const { wallet, search, pageIndex = 1, pageSize = 10, name } = where;
+    const token = await this.tokenService.findOne({
+      name,
+    });
+    if (!token) {
+      throw new HttpException('代币不存在', 400);
+    }
+    let foo: any;
+    // 如果合约地址为空；则查询主流币交易记录
+    if (token.contract === '') {
+      foo = {
+        input: '0x0',
+      };
+    } else {
+      foo = {
+        to: token.contract,
+      };
+    }
+
     const limit = Number(pageSize);
     const offset = pageIndex < 1 ? 0 : Number(pageIndex - 1) * Number(pageSize);
     let options: any;
@@ -59,7 +77,7 @@ export class EthTransactionService {
     }
 
     const res = await this.transactionRepo.findAndCountAll({
-      where: options,
+      where: R.mergeRight(options, foo),
       attributes: {
         exclude: ['gasUsed', 'status'],
       },

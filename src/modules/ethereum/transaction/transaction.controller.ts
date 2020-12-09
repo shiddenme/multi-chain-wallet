@@ -7,7 +7,8 @@ import { IsNotEmpty } from 'class-validator';
 class findTransactionDto {
   @IsNotEmpty({ message: '钱包地址为空' })
   wallet: string;
-
+  @IsNotEmpty({ message: '代币名称为空' })
+  name: string;
   search: string;
   pageIndex: number = 0;
   pageSize: number = 10;

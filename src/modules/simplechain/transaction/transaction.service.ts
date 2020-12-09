@@ -1,9 +1,9 @@
-import { Injectable, Inject, forwardRef } from '@nestjs/common';
+import { Injectable, Inject, forwardRef, HttpException } from '@nestjs/common';
 import { Sipc_Transaction } from './transaction.entity';
 import * as R from 'ramda';
 import { Op } from 'sequelize';
 import { Web3Service } from '../../../shared/services/web3.service';
-import { SipcBlockService } from '../block/block.service';
+
 import { SipcTokenService } from '../token/token.service';
 import * as moment from 'moment';
 @Injectable()
@@ -11,7 +11,6 @@ export class SipcTransactionService {
   constructor(
     @Inject(forwardRef(() => Web3Service))
     private readonly web3Service: Web3Service,
-    private readonly blockService: SipcBlockService,
     private readonly tokenService: SipcTokenService,
     @Inject('sipc_transaction_repo')
     private readonly transactionRepo: typeof Sipc_Transaction,
@@ -38,9 +37,26 @@ export class SipcTransactionService {
       raw: true,
     });
   }
-
   async findAll(where) {
-    const { wallet, search, pageIndex = 1, pageSize = 10 } = where;
+    const { wallet, search, pageIndex = 1, pageSize = 10, name } = where;
+    const token = await this.tokenService.findOne({
+      name,
+    });
+    if (!token) {
+      throw new HttpException('代币不存在', 400);
+    }
+    let foo: any;
+    // 如果合约地址为空；则查询主流币交易记录
+    if (token.contract === '') {
+      foo = {
+        input: '0x0',
+      };
+    } else {
+      foo = {
+        to: token.contract,
+      };
+    }
+
     const limit = Number(pageSize);
     const offset = pageIndex < 1 ? 0 : Number(pageIndex - 1) * Number(pageSize);
     let options: any;
@@ -59,7 +75,7 @@ export class SipcTransactionService {
     }
 
     const res = await this.transactionRepo.findAndCountAll({
-      where: options,
+      where: R.mergeRight(options, foo),
       attributes: {
         exclude: ['gasUsed', 'status'],
       },
@@ -90,7 +106,7 @@ export class SipcTransactionService {
         const token = await this.tokenService.findOne({
           contract: to.toString(),
         });
-        const symbol = token ? token.symbol : 'SIPC';
+        const symbol = token ? token.symbol : 'ETH';
 
         let mark: number = 1;
         if (from.toString() === wallet) {
