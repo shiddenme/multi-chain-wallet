@@ -19,7 +19,7 @@ export class SipcTokenService {
     const { search = '' } = where;
     if (!search) {
       options = {};
-    } else if (search.test(/^0x/)) {
+    } else if (/^0x/.test(search)) {
       options = {
         contract: search,
       };
