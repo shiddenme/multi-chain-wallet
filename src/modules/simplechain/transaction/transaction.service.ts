@@ -38,7 +38,8 @@ export class SipcTransactionService {
     });
   }
   async findAll(where) {
-    const { wallet, search, pageIndex = 1, pageSize = 10, name } = where;
+    const { wallet, pageIndex = 1, pageSize = 10, name } = where;
+    let search = where.search;
     const token = await this.tokenService.findOne({
       name,
     });
@@ -49,11 +50,13 @@ export class SipcTransactionService {
     // 如果合约地址为空；则查询主流币交易记录
     if (token.contract === '') {
       foo = {
-        input: '0x0',
+        type: 'EOA',
       };
     } else {
+      search = 'from';
       foo = {
         to: token.contract,
+        type: 'CALL',
       };
     }
 
@@ -106,7 +109,7 @@ export class SipcTransactionService {
         const token = await this.tokenService.findOne({
           contract: to.toString(),
         });
-        const symbol = token ? token.symbol : 'ETH';
+        const symbol = token ? token.symbol : 'SIPC';
 
         let mark: number = 1;
         if (from.toString() === wallet) {

@@ -200,9 +200,10 @@ export class Web3Service {
       const queue = [];
       for (let i = 0; i < result.transactions.length; i++) {
         const transaction = result.transactions[i];
-
+        transaction.type = transaction.input === '0x' ? 'EOA' : 'CALL';
         (transaction.input === '0x' || transaction.input.length > 50000) &&
           (transaction.input = '0x0');
+
         transaction.timestamp = timestamp;
         const transactionObj = R.pick([
           'blockHash',
@@ -216,6 +217,7 @@ export class Web3Service {
           'to',
           'transactionIndex',
           'value',
+          'type',
           'timestamp',
         ])(transaction);
         queue.push(this.ethTransactionService.findOrCreate(transactionObj));

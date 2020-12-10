@@ -40,7 +40,8 @@ export class EthTransactionService {
   }
 
   async findAll(where) {
-    const { wallet, search, pageIndex = 1, pageSize = 10, name } = where;
+    const { wallet, pageIndex = 1, pageSize = 10, name } = where;
+    let search = where.search;
     const token = await this.tokenService.findOne({
       name,
     });
@@ -51,11 +52,13 @@ export class EthTransactionService {
     // 如果合约地址为空；则查询主流币交易记录
     if (token.contract === '') {
       foo = {
-        input: '0x0',
+        type: 'EOA',
       };
     } else {
+      search = 'from';
       foo = {
         to: token.contract,
+        type: 'CALL',
       };
     }
 
