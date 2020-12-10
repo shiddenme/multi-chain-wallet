@@ -18,6 +18,7 @@ import { ConfigService } from '../../core';
 const Web3 = require('web3');
 
 import { Web3Service } from './web3.service';
+import { from } from 'rxjs';
 @Injectable()
 export class SipcService {
   constructor(
@@ -166,7 +167,7 @@ export class SipcService {
     const number = await this.web3Service.sipc.eth.getBlockNumber();
     console.log('start block:', number);
     this.listenBlock(number);
-    this.listenBlockTransactions(4100430);
+    this.listenBlockTransactions(4826601);
   }
 
   async listenBlockTransactions(blockNumber) {
@@ -187,6 +188,7 @@ export class SipcService {
         return false;
       }
       const queue = [];
+
       for (let i = 0; i < result.transactions.length; i++) {
         const transaction = result.transactions[i];
 
@@ -199,6 +201,8 @@ export class SipcService {
           const code = await this.web3Service.sipc.eth.getCode(transaction.to);
           if (code === '0x') {
             transaction.type = 'EOA';
+          } else {
+            transaction.type = 'CALL';
           }
         }
         const transactionObj = R.pick([
@@ -216,7 +220,14 @@ export class SipcService {
           'type',
           'timestamp',
         ])(transaction);
-        queue.push(this.sipcTransactionService.findOrCreate(transactionObj));
+        queue.push(
+          this.sipcTransactionService.findOrCreate(
+            R.mergeRight(transactionObj, {
+              from: transaction.from.toString().toLowerCase(),
+              to: transaction.to.toString().toLowerCase(),
+            }),
+          ),
+        );
       }
       await Promise.all(queue);
     } catch (e) {

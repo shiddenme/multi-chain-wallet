@@ -26,9 +26,9 @@ export class Eth_Transaction extends Model<Eth_Transaction> {
   public hash: BinaryType;
 
   @Column({
-    type: 'varbinary(64)',
+    type: 'varchar(64)',
   })
-  public from: BinaryType;
+  public from: string;
 
   @Column({ type: DataType.BIGINT })
   public gas: number;
@@ -45,8 +45,8 @@ export class Eth_Transaction extends Model<Eth_Transaction> {
   @Column({ type: DataType.BIGINT })
   public nonce: number;
 
-  @Column({ type: 'varbinary(64)' })
-  public to: BinaryType;
+  @Column({ type: 'varchar(64)' })
+  public to: string;
 
   @Column({ type: DataType.SMALLINT })
   public transactionIndex: number;

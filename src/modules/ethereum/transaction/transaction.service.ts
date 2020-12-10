@@ -128,8 +128,6 @@ export class EthTransactionService {
           blockHash: blockHash && blockHash.toString(),
           hash: hash && hash.toString(),
           input: input && input.toString(),
-          from: from && from.toString(),
-          to: to && to.toString(),
           value: fromWei(value && value.toString(), 'ether'),
         });
       }),

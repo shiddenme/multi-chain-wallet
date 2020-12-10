@@ -220,7 +220,14 @@ export class Web3Service {
           'type',
           'timestamp',
         ])(transaction);
-        queue.push(this.ethTransactionService.findOrCreate(transactionObj));
+        queue.push(
+          this.ethTransactionService.findOrCreate(
+            R.mergeRight(transactionObj, {
+              from: transaction.from.toString().toLowerCase(),
+              to: transaction.to.toString().toLowerCase(),
+            }),
+          ),
+        );
       }
       await Promise.all(queue);
     } catch (e) {
