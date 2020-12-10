@@ -223,8 +223,9 @@ export class SipcService {
         queue.push(
           this.sipcTransactionService.findOrCreate(
             R.mergeRight(transactionObj, {
-              from: transaction.from.toString().toLowerCase(),
-              to: transaction.to.toString().toLowerCase(),
+              from:
+                transaction.from && transaction.from.toString().toLowerCase(),
+              to: transaction.to && transaction.to.toString().toLowerCase(),
             }),
           ),
         );
