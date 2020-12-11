@@ -88,6 +88,7 @@ export class SipcTransactionService {
       offset,
     });
 
+    // todo 用redis存储
     const corssAddress = [
       '0xf7bea9e8a0c8e99af6e52ff5e41ec9cac6e6c314',
       '0x9363611fb9b9b2d6f731963c2ffa6cecf2ec0886',
@@ -95,15 +96,7 @@ export class SipcTransactionService {
     const { rows, count } = res;
     const transactions = await Promise.all(
       rows.map(async (transaction) => {
-        const {
-          hash,
-          from,
-          to,
-          blockHash,
-          value,
-          input,
-          timestamp,
-        } = transaction;
+        const { hash, to, blockHash, value, input, timestamp } = transaction;
         const transactionReceipt = await this.web3Service.getTransactionReceipt(
           hash.toString(),
           false,
