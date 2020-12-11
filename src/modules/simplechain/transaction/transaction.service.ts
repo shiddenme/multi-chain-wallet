@@ -94,10 +94,11 @@ export class SipcTransactionService {
       limit,
       offset,
     });
-    const result = await this.httpService
-      .get('https://explorer.simplechain.com/api/cross/token/list')
-      .toPromise();
-    const corssAddress = R.map(R.prop('crossAddress'))(result.data);
+
+    const corssAddress = [
+      '0xf7bea9e8a0c8e99af6e52ff5e41ec9cac6e6c314',
+      '0x9363611fb9b9b2d6f731963c2ffa6cecf2ec0886',
+    ];
     const { rows, count } = res;
     const transactions = await Promise.all(
       rows.map(async (transaction) => {

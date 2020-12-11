@@ -70,10 +70,10 @@ export class EthTransactionService {
       };
     }
 
-    const result = await this.httpService
-      .get('https://explorer.simplechain.com/api/cross/token/list')
-      .toPromise();
-    const corssAddress = R.map(R.prop('crossAddress'))(result.data);
+    const corssAddress = [
+      '0xf7bea9e8a0c8e99af6e52ff5e41ec9cac6e6c314',
+      '0x9363611fb9b9b2d6f731963c2ffa6cecf2ec0886',
+    ];
     const limit = Number(pageSize);
     const offset = pageIndex < 1 ? 0 : Number(pageIndex - 1) * Number(pageSize);
     let options: any;
