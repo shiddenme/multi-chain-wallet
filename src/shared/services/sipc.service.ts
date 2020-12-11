@@ -18,7 +18,7 @@ import { ConfigService } from '../../core';
 const Web3 = require('web3');
 
 import { Web3Service } from './web3.service';
-import { from } from 'rxjs';
+
 @Injectable()
 export class SipcService {
   constructor(
@@ -167,7 +167,7 @@ export class SipcService {
     const number = await this.web3Service.sipc.eth.getBlockNumber();
     console.log('start block:', number);
     this.listenBlock(number);
-    this.listenBlockTransactions(4826601);
+    this.listenBlockTransactions(number);
   }
 
   async listenBlockTransactions(blockNumber) {

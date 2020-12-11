@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, HttpModule } from '@nestjs/common';
 import { EthTransactionService } from './transaction.service';
 import { EthTransactionProviders } from './transaction.providers';
 import { EthTransactionController } from './transaction.controller';
@@ -8,7 +8,7 @@ import { EthTokenModule } from '../token/token.module';
 
 @Module({
   controllers: [EthTransactionController],
-  imports: [DatabaseModule, EthBlockModule, EthTokenModule],
+  imports: [DatabaseModule, EthBlockModule, EthTokenModule, HttpModule],
   providers: [EthTransactionService, ...EthTransactionProviders],
   exports: [EthTransactionService],
 })

@@ -1,4 +1,10 @@
-import { Injectable, Inject, forwardRef, HttpException } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  forwardRef,
+  HttpException,
+  HttpService,
+} from '@nestjs/common';
 import { Sipc_Transaction } from './transaction.entity';
 import * as R from 'ramda';
 import { Op } from 'sequelize';
@@ -11,6 +17,7 @@ export class SipcTransactionService {
   constructor(
     @Inject(forwardRef(() => Web3Service))
     private readonly web3Service: Web3Service,
+    private readonly httpService: HttpService,
     private readonly tokenService: SipcTokenService,
     @Inject('sipc_transaction_repo')
     private readonly transactionRepo: typeof Sipc_Transaction,
@@ -87,6 +94,10 @@ export class SipcTransactionService {
       limit,
       offset,
     });
+    const result = await this.httpService
+      .get('https://explorer.simplechain.com/api/cross/token/list')
+      .toPromise();
+    const corssAddress = R.map(R.prop('crossAddress'))(result.data);
     const { rows, count } = res;
     const transactions = await Promise.all(
       rows.map(async (transaction) => {
@@ -106,6 +117,14 @@ export class SipcTransactionService {
         const date = timestamp
           ? moment(timestamp * 1000).format('YYYY-MM-DD hh:mm:ss')
           : '';
+        let title: string;
+        if (to === wallet) {
+          title = '收款';
+        } else if (corssAddress.includes(to)) {
+          title = '跨链';
+        } else {
+          title = '支付';
+        }
         const token = await this.tokenService.findOne({
           contract: to.toString(),
         });
@@ -123,6 +142,7 @@ export class SipcTransactionService {
           date,
           symbol,
           mark,
+          title,
           blockHash: blockHash && blockHash.toString(),
           hash: hash && hash.toString(),
           input: input && input.toString(),

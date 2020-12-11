@@ -1,4 +1,10 @@
-import { Injectable, Inject, forwardRef, HttpException } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  forwardRef,
+  HttpException,
+  HttpService,
+} from '@nestjs/common';
 import { Eth_Transaction } from './transaction.entity';
 import { fromWei } from '../../../shared/utils/tools';
 
@@ -12,6 +18,7 @@ export class EthTransactionService {
   constructor(
     @Inject(forwardRef(() => Web3Service))
     private readonly web3Service: Web3Service,
+    private readonly httpService: HttpService,
     private readonly tokenService: EthTokenService,
     @Inject('eth_transaction_repo')
     private readonly transactionRepo: typeof Eth_Transaction,
@@ -62,6 +69,10 @@ export class EthTransactionService {
       };
     }
 
+    const result = await this.httpService
+      .get('https://explorer.simplechain.com/api/cross/token/list')
+      .toPromise();
+    const corssAddress = R.map(R.prop('crossAddress'))(result.data);
     const limit = Number(pageSize);
     const offset = pageIndex < 1 ? 0 : Number(pageIndex - 1) * Number(pageSize);
     let options: any;
@@ -95,11 +106,11 @@ export class EthTransactionService {
         const {
           hash,
           from,
-          to,
           blockHash,
           value,
           input,
           timestamp,
+          to,
         } = transaction;
         const transactionReceipt = await this.web3Service.getTransactionReceipt(
           hash.toString(),
@@ -108,11 +119,14 @@ export class EthTransactionService {
         const date = timestamp
           ? moment(timestamp * 1000).format('YYYY-MM-DD hh:mm:ss')
           : '';
-        const token = await this.tokenService.findOne({
-          contract: to.toString(),
-        });
-        const symbol = token ? token.symbol : 'ETH';
-
+        let title: string;
+        if (to === wallet) {
+          title = '收款';
+        } else if (corssAddress.includes(to)) {
+          title = '跨链';
+        } else {
+          title = '支付';
+        }
         let mark: number = 1;
         if (from.toString() === wallet) {
           mark = -1;
@@ -120,10 +134,10 @@ export class EthTransactionService {
         const { cumulativeGasUsed, gasUsed, status } = transactionReceipt;
         return R.mergeRight(transaction, {
           cumulativeGasUsed,
+          title,
           gasUsed,
           status,
           date,
-          symbol,
           mark,
           blockHash: blockHash && blockHash.toString(),
           hash: hash && hash.toString(),
