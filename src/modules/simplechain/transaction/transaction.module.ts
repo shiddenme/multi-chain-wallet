@@ -1,4 +1,4 @@
-import { Module, HttpModule } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { SipcTransactionService } from './transaction.service';
 import { SipcTransactionProviders } from './transaction.providers';
 import { SipcTransactionController } from './transaction.controller';
@@ -7,7 +7,7 @@ import { SipcBlockModule } from '../block/block.module';
 import { SipcTokenModule } from '../token/token.module';
 @Module({
   controllers: [SipcTransactionController],
-  imports: [DatabaseModule, SipcBlockModule, SipcTokenModule, HttpModule],
+  imports: [DatabaseModule, SipcBlockModule, SipcTokenModule],
   providers: [SipcTransactionService, ...SipcTransactionProviders],
   exports: [SipcTransactionService],
 })

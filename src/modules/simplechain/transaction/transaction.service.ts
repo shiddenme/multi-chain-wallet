@@ -1,10 +1,4 @@
-import {
-  Injectable,
-  Inject,
-  forwardRef,
-  HttpException,
-  HttpService,
-} from '@nestjs/common';
+import { Injectable, Inject, forwardRef, HttpException } from '@nestjs/common';
 import { Sipc_Transaction } from './transaction.entity';
 import * as R from 'ramda';
 import { Op } from 'sequelize';
@@ -17,7 +11,6 @@ export class SipcTransactionService {
   constructor(
     @Inject(forwardRef(() => Web3Service))
     private readonly web3Service: Web3Service,
-    private readonly httpService: HttpService,
     private readonly tokenService: SipcTokenService,
     @Inject('sipc_transaction_repo')
     private readonly transactionRepo: typeof Sipc_Transaction,

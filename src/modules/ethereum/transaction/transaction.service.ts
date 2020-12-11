@@ -1,10 +1,4 @@
-import {
-  Injectable,
-  Inject,
-  forwardRef,
-  HttpException,
-  HttpService,
-} from '@nestjs/common';
+import { Injectable, Inject, forwardRef, HttpException } from '@nestjs/common';
 import { Eth_Transaction } from './transaction.entity';
 import { fromWei } from '../../../shared/utils/tools';
 
@@ -12,14 +6,13 @@ import * as R from 'ramda';
 import { Op } from 'sequelize';
 import { Web3Service } from '../../../shared/services/web3.service';
 import { EthTokenService } from '../token/token.service';
-import { erc20AbI } from '../../../shared/abi/erc20';
+
 import * as moment from 'moment';
 @Injectable()
 export class EthTransactionService {
   constructor(
     @Inject(forwardRef(() => Web3Service))
     private readonly web3Service: Web3Service,
-    private readonly httpService: HttpService,
     private readonly tokenService: EthTokenService,
     @Inject('eth_transaction_repo')
     private readonly transactionRepo: typeof Eth_Transaction,
