@@ -14,17 +14,6 @@ class findTransactionDto {
   pageSize: number;
 }
 
-class getTransferDto {
-  @IsNotEmpty({ message: '转账地址为空' })
-  to: string;
-
-  @IsNotEmpty({ message: '转账数量为空' })
-  value: string;
-
-  @IsNotEmpty({ message: '合约地址为空' })
-  contract: string;
-}
-
 @Controller('sipc')
 export class SipcTransactionController {
   constructor(private readonly transactionService: SipcTransactionService) {}
@@ -33,11 +22,5 @@ export class SipcTransactionController {
   @UseFilters(new HttpExceptionFilter())
   async findAll(@Query() query: findTransactionDto) {
     return await this.transactionService.findAll(query);
-  }
-
-  @Get('transfer')
-  @UseFilters(new HttpExceptionFilter())
-  async getTransfer(@Query() query: getTransferDto) {
-    return await this.transactionService.getTransfer(query);
   }
 }

@@ -20,16 +20,13 @@ class getTransferDto {
 
   @IsNotEmpty({ message: '转账数量为空' })
   value: string;
-
-  @IsNotEmpty({ message: '合约地址为空' })
-  contract: string;
 }
 
-@Controller('eth')
+@Controller()
 export class EthTransactionController {
   constructor(private readonly transactionService: EthTransactionService) {}
 
-  @Get('/transaction')
+  @Get('eth/transaction')
   @UseFilters(new HttpExceptionFilter())
   async findAll(@Query() query: findTransactionDto) {
     return await this.transactionService.findAll(query);

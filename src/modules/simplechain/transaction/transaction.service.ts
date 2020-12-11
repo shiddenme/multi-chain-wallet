@@ -149,11 +149,4 @@ export class SipcTransactionService {
       count,
     };
   }
-
-  async getTransfer(where) {
-    const transfer = await this.web3Service.getTransfer(where, false);
-    return {
-      transfer,
-    };
-  }
 }

@@ -255,10 +255,9 @@ export class Web3Service {
   }
 
   // 获取交易对象
-  async getTransfer(transactionObject, f: boolean) {
-    const { to, value, contract } = transactionObject;
-    const myContract = f ? this.web3Contract : this.sipcContract;
-    myContract.options.address = contract;
+  async getTransfer(transactionObject) {
+    const { to, value } = transactionObject;
+    const myContract = this.web3Contract;
     // 如果是合约交易；to字段为合约地址；如果非合约交易to字段为想要发送的账户地址
     const data = myContract.methods.transfer(to, Number(value)).encodeABI();
     return data;

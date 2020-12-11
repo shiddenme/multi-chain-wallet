@@ -104,15 +104,7 @@ export class EthTransactionService {
     const { rows, count } = res;
     const transactions = await Promise.all(
       rows.map(async (transaction) => {
-        const {
-          hash,
-          from,
-          blockHash,
-          value,
-          input,
-          timestamp,
-          to,
-        } = transaction;
+        const { hash, blockHash, value, input, timestamp, to } = transaction;
         const transactionReceipt = await this.web3Service.getTransactionReceipt(
           hash.toString(),
           true,
@@ -153,7 +145,7 @@ export class EthTransactionService {
   }
 
   async getTransfer(where) {
-    const transfer = await this.web3Service.getTransfer(where, true);
+    const transfer = await this.web3Service.getTransfer(where);
     return {
       transfer,
     };
