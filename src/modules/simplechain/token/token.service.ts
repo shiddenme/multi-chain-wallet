@@ -72,8 +72,10 @@ export class SipcTokenService {
           wallet,
           false,
         );
+        const gasPrice = await this.web3Service.getGasPrice(false);
         return R.mergeRight(token, {
           balance,
+          gasPrice,
           server: this.config.get('web3')['sipcServer'],
         });
       }),

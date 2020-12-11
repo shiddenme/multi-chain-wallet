@@ -68,8 +68,10 @@ export class EthTokenService {
           wallet,
           true,
         );
+        const gasPrice = await this.web3Service.getGasPrice(true);
         return R.mergeRight(token, {
           balance,
+          gasPrice,
           server: this.config.get('web3')['gethServer'],
         });
       }),

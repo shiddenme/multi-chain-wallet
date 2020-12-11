@@ -66,6 +66,16 @@ export class Web3Service {
     }
   }
 
+  async getGasPrice(f: boolean) {
+    try {
+      const server = f ? this.web3 : this.sipc;
+      return await server.eth.getGasPrice();
+    } catch (e) {
+      console.log(e);
+      throw new HttpException('节点错误', 500);
+    }
+  }
+
   async setProvider(url?: string) {
     url || (url = this.config.get('web3')['gethServer']);
     try {
