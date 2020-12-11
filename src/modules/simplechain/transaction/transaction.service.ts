@@ -118,21 +118,14 @@ export class SipcTransactionService {
           ? moment(timestamp * 1000).format('YYYY-MM-DD hh:mm:ss')
           : '';
         let title: string;
+        let mark = '-';
         if (to === wallet) {
           title = '收款';
+          mark = '+';
         } else if (corssAddress.includes(to)) {
           title = '跨链';
         } else {
           title = '支付';
-        }
-        const token = await this.tokenService.findOne({
-          contract: to.toString(),
-        });
-        const symbol = token ? token.symbol : 'SIPC';
-
-        let mark: number = 1;
-        if (from.toString() === wallet) {
-          mark = -1;
         }
         const { cumulativeGasUsed, gasUsed, status } = transactionReceipt;
         return R.mergeRight(transaction, {
@@ -140,7 +133,6 @@ export class SipcTransactionService {
           gasUsed,
           status,
           date,
-          symbol,
           mark,
           title,
           blockHash: blockHash && blockHash.toString(),
@@ -154,6 +146,13 @@ export class SipcTransactionService {
     return {
       transactions,
       count,
+    };
+  }
+
+  async getTransfer(where) {
+    const transfer = await this.web3Service.getTransfer(where, false);
+    return {
+      transfer,
     };
   }
 }

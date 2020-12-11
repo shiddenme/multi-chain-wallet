@@ -12,6 +12,7 @@ import * as R from 'ramda';
 import { Op } from 'sequelize';
 import { Web3Service } from '../../../shared/services/web3.service';
 import { EthTokenService } from '../token/token.service';
+import { erc20AbI } from '../../../shared/abi/erc20';
 import * as moment from 'moment';
 @Injectable()
 export class EthTransactionService {
@@ -120,16 +121,14 @@ export class EthTransactionService {
           ? moment(timestamp * 1000).format('YYYY-MM-DD hh:mm:ss')
           : '';
         let title: string;
+        let mark = '-';
         if (to === wallet) {
           title = '收款';
+          mark = '+';
         } else if (corssAddress.includes(to)) {
           title = '跨链';
         } else {
           title = '支付';
-        }
-        let mark: number = 1;
-        if (from.toString() === wallet) {
-          mark = -1;
         }
         const { cumulativeGasUsed, gasUsed, status } = transactionReceipt;
         return R.mergeRight(transaction, {
@@ -150,6 +149,13 @@ export class EthTransactionService {
     return {
       transactions,
       count,
+    };
+  }
+
+  async getTransfer(where) {
+    const transfer = await this.web3Service.getTransfer(where, true);
+    return {
+      transfer,
     };
   }
 }

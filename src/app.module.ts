@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 
 import { CoreModule } from './core';
-import { SharedModule } from './shared';
+import { Web3Module, SipcModule } from './shared';
 
 @Module({
-  imports: [CoreModule, SharedModule],
+  imports: [CoreModule, Web3Module, SipcModule],
 })
 export class AppModule {}
