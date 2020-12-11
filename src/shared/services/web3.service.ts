@@ -18,7 +18,6 @@ import * as R from 'ramda';
 const Web3 = require('web3');
 const BN = require('bn.js');
 import { erc20AbI } from '../abi/erc20';
-import { fromWei } from '../utils/tools';
 
 @Injectable()
 export class Web3Service {
@@ -44,7 +43,7 @@ export class Web3Service {
     if (!contract) {
       const server = f ? this.web3 : this.sipc;
       const value = await server.eth.getBalance(wallet);
-      return f ? fromWei(value, 'ether') : value;
+      return value;
     }
     const myContract = f ? this.web3Contract : this.sipcContract;
     myContract.options.address = contract;

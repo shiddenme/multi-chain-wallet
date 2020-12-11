@@ -1,6 +1,5 @@
 import { Injectable, Inject, forwardRef, HttpException } from '@nestjs/common';
 import { Eth_Transaction } from './transaction.entity';
-import { fromWei } from '../../../shared/utils/tools';
 
 import * as R from 'ramda';
 import { Op } from 'sequelize';
@@ -126,7 +125,7 @@ export class EthTransactionService {
           blockHash: blockHash && blockHash.toString(),
           hash: hash && hash.toString(),
           input: input && input.toString(),
-          value: fromWei(value && value.toString(), 'ether'),
+          value: value && value.toString(),
         });
       }),
     );
