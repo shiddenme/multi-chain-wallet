@@ -29,10 +29,6 @@ export class SipcService {
     private readonly config: ConfigService,
   ) {}
 
-  async getTransactionReceipt(hash: string) {
-    return await this.web3Service.sipc.eth.getTransactionReceipt(hash);
-  }
-
   async setProvider() {
     try {
       await this.web3Service.sipc.eth.net.isListening();

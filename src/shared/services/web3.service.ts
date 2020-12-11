@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException } from '@nestjs/common';
 import { ConfigService } from '../../core';
 import {
   EthBlockService,
@@ -40,20 +40,30 @@ export class Web3Service {
 
   // 合约地址为空：查询主流币余额
   async myBalanceOf(contract, wallet, f: boolean) {
-    if (!contract) {
-      const server = f ? this.web3 : this.sipc;
-      const value = await server.eth.getBalance(wallet);
-      return value;
-    }
-    const myContract = f ? this.web3Contract : this.sipcContract;
-    myContract.options.address = contract;
+    try {
+      if (!contract) {
+        const server = f ? this.web3 : this.sipc;
+        const value = await server.eth.getBalance(wallet);
+        return value;
+      }
+      const myContract = f ? this.web3Contract : this.sipcContract;
+      myContract.options.address = contract;
 
-    return await myContract.methods.balanceOf(wallet).call();
+      return await myContract.methods.balanceOf(wallet).call();
+    } catch (e) {
+      console.log(e);
+      throw new HttpException('节点错误', 500);
+    }
   }
 
   async getTransactionReceipt(hash: string, f: boolean) {
-    const link = f ? this.web3 : this.sipc;
-    return await link.eth.getTransactionReceipt(hash);
+    try {
+      const server = f ? this.web3 : this.sipc;
+      return await server.eth.getTransactionReceipt(hash);
+    } catch (e) {
+      console.log(e);
+      throw new HttpException('节点错误', 500);
+    }
   }
 
   async setProvider(url?: string) {
@@ -255,9 +265,14 @@ export class Web3Service {
 
   // 编码erc20交易函数
   async getTransfer(transactionObject) {
-    const { to, value } = transactionObject;
-    const myContract = this.web3Contract;
-    const data = myContract.methods.transfer(to, Number(value)).encodeABI();
-    return data;
+    try {
+      const { to, value } = transactionObject;
+      const myContract = this.web3Contract;
+      const data = myContract.methods.transfer(to, Number(value)).encodeABI();
+      return data;
+    } catch (e) {
+      console.log(e);
+      throw new HttpException(e.code + ',' + e.argument, 400);
+    }
   }
 }
