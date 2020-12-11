@@ -163,7 +163,7 @@ export class SipcService {
     const number = await this.web3Service.sipc.eth.getBlockNumber();
     console.log('start block:', number);
     this.listenBlock(number);
-    this.listenBlockTransactions(number);
+    this.listenBlockTransactions(1300);
   }
 
   async listenBlockTransactions(blockNumber) {

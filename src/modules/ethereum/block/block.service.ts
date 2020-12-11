@@ -20,19 +20,6 @@ export class EthBlockService {
     return await repo.findOne(options);
   }
 
-  async findBlockTimeStamp(blcokNumber) {
-    const index = whickBlockRepo(blcokNumber);
-    const repo = this.repoList[index - 1];
-    const time = await repo.findOne({
-      where: {
-        number: blcokNumber,
-      },
-      attributes: ['timestamp'],
-      raw: true,
-    });
-    return time ? moment(time.timestamp * 1000).format('YYYY-MM-DD') : 0;
-  }
-
   async findOrCreate(options) {
     const index = whickBlockRepo(options.number);
     const repo = this.repoList[index - 1];
