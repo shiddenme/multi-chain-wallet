@@ -1,5 +1,7 @@
 import { Injectable, HttpException } from '@nestjs/common';
 import { ConfigService } from '../../core';
+
+import { BigNumber } from 'bignumber.js';
 import {
   EthBlockService,
   EthUncleService,
@@ -278,7 +280,9 @@ export class Web3Service {
     try {
       const { to, value } = transactionObject;
       const myContract = this.web3Contract;
-      const data = myContract.methods.transfer(to, Number(value)).encodeABI();
+      let x = new BigNumber(value);
+      const data = myContract.methods.transfer(to, x).encodeABI();
+
       return data;
     } catch (e) {
       console.log(e);
