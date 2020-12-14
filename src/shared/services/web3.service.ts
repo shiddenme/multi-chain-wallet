@@ -57,6 +57,21 @@ export class Web3Service {
     }
   }
 
+  async getDecimals(contract, f: boolean) {
+    try {
+      if (!contract) {
+        return '18';
+      }
+      const myContract = f ? this.web3Contract : this.sipcContract;
+      myContract.options.address = contract;
+
+      return await myContract.methods.decimals().call();
+    } catch (e) {
+      console.log(e);
+      throw new HttpException('节点错误', 500);
+    }
+  }
+
   async getTransactionReceipt(hash: string, f: boolean) {
     try {
       const server = f ? this.web3 : this.sipc;

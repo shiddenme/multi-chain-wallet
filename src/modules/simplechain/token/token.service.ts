@@ -79,9 +79,11 @@ export class SipcTokenService {
           false,
         );
         const gasPrice = await this.web3Service.getGasPrice(false);
+        const decimals = await this.web3Service.getDecimals(contract, false);
         return R.mergeRight(token, {
           balance,
           gasPrice,
+          decimals,
           server: this.config.get('web3')['sipcServer'],
         });
       }),

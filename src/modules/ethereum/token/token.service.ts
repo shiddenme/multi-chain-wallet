@@ -72,10 +72,12 @@ export class EthTokenService {
           wallet,
           true,
         );
+        const decimals = await this.web3Service.getDecimals(contract, true);
         const gasPrice = await this.web3Service.getGasPrice(true);
         return R.mergeRight(token, {
           balance,
           gasPrice,
+          decimals,
           server: this.config.get('web3')['gethServer'],
         });
       }),
