@@ -156,7 +156,7 @@ export class SipcService {
       console.log('get sipcBlock error:', blockNumber, e);
       blockNumber--;
     }
-    await sleep(500);
+
     await this.listenBlock(blockNumber + 1);
   }
 
@@ -232,7 +232,7 @@ export class SipcService {
       console.log('get sipcTransactions error:', blockNumber, e);
       blockNumber--;
     }
-    await sleep(500);
+
     await this.listenBlockTransactions(blockNumber + 1);
   }
 }

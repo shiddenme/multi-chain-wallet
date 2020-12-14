@@ -193,7 +193,7 @@ export class Web3Service {
       console.log('get ethBlock error:', blockNumber, e);
       blockNumber--;
     }
-    await sleep(500);
+
     await this.listenBlock(blockNumber + 1);
   }
 
@@ -256,7 +256,7 @@ export class Web3Service {
       console.log('get ethTransactions error:', blockNumber, e);
       blockNumber--;
     }
-    await sleep(500);
+
     await this.listenBlockTransactions(blockNumber + 1);
   }
 
