@@ -7,6 +7,8 @@ import { Op } from 'sequelize';
 import { ConfigService } from '../../../core';
 class findTokenDto {
   search: string;
+  pageIndex: number;
+  pageSize: number;
 }
 
 @Injectable()
@@ -20,7 +22,9 @@ export class SipcTokenService {
 
   async findAll(where: findTokenDto) {
     let options: any;
-    const { search = '' } = where;
+    const { search = '', pageIndex = 1, pageSize = 10 } = where;
+    const limit = Number(pageSize);
+    const offset = pageIndex < 1 ? 0 : Number(pageIndex - 1) * Number(pageSize);
     if (!search) {
       options = {};
     } else if (/^0x/.test(search)) {
@@ -34,14 +38,16 @@ export class SipcTokenService {
         },
       };
     }
-    const tokens = await this.tokenRepo.findAll({
+    const res = await this.tokenRepo.findAndCountAll({
       where: options,
-      limit: 10,
+      limit,
+      offset,
       order: [['sort', 'asc']],
       raw: true,
     });
     return {
-      tokens,
+      tokens: res.rows,
+      count: res.count,
     };
   }
 
