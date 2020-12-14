@@ -102,7 +102,9 @@ export class EthTransactionService {
           true,
         );
         const date = timestamp
-          ? moment(timestamp * 1000).format('YYYY-MM-DD hh:mm:ss')
+          ? moment(timestamp * 1000)
+              .utc()
+              .format('YYYY-MM-DD HH:mm:ss')
           : '';
         let title: string;
         let mark = '-';
