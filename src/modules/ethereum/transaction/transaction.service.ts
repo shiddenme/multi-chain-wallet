@@ -94,16 +94,18 @@ export class EthTransactionService {
       offset,
     });
     const { rows, count } = res;
+
     const transactions = await Promise.all(
       rows.map(async (transaction) => {
         const { hash, blockHash, value, input, timestamp, to } = transaction;
+        let _value = value && value.toString();
         const transactionReceipt = await this.web3Service.getTransactionReceipt(
           hash.toString(),
           true,
         );
         const date = timestamp
           ? moment(timestamp * 1000)
-              .utc()
+              .utcOffset(480)
               .format('YYYY-MM-DD HH:mm:ss')
           : '';
         let title: string;
@@ -116,7 +118,28 @@ export class EthTransactionService {
         } else {
           title = '支付';
         }
-        const { cumulativeGasUsed, gasUsed, status } = transactionReceipt;
+        const { cumulativeGasUsed, gasUsed, status, logs } = transactionReceipt;
+        // 判断是否为交易事件
+        if (
+          logs[0].topics[0] ===
+          '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
+        ) {
+          const parameter = '0x' + input.toString().slice(10);
+          const result = await this.web3Service.decodeParameters(
+            [
+              {
+                type: 'address',
+                name: 'to',
+              },
+              {
+                type: 'uint256',
+                name: 'value',
+              },
+            ],
+            parameter,
+          );
+          _value = result.value;
+        }
         return R.mergeRight(transaction, {
           cumulativeGasUsed,
           title,
@@ -127,7 +150,7 @@ export class EthTransactionService {
           blockHash: blockHash && blockHash.toString(),
           hash: hash && hash.toString(),
           input: input && input.toString(),
-          value: value && value.toString(),
+          value: _value,
         });
       }),
     );

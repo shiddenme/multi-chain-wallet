@@ -19,6 +19,10 @@ import * as R from 'ramda';
 const Web3 = require('web3');
 const BN = require('bn.js');
 import { erc20AbI } from '../abi/erc20';
+class parseDto {
+  type: string;
+  name: string;
+}
 
 @Injectable()
 export class Web3Service {
@@ -303,5 +307,9 @@ export class Web3Service {
       console.log(e);
       throw new HttpException(e.code + ',' + e.argument, 400);
     }
+  }
+
+  decodeParameters(parse: parseDto[], input: string) {
+    return this.web3.eth.abi.decodeParameters(parse, input);
   }
 }

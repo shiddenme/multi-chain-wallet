@@ -31,6 +31,7 @@
     "@nestjs/serve-static": "^2.1.4",
     "@types/joi": "^14.3.4",
     "@types/sequelize": "^4.28.8",
+    "abi-decoder": "^2.3.0",
     "bignumber.js": "^9.0.1",
     "bn.js": "^5.1.1",
     "class-transformer": "^0.3.1",

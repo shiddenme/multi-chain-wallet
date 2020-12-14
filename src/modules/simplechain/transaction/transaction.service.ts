@@ -97,13 +97,14 @@ export class SipcTransactionService {
     const transactions = await Promise.all(
       rows.map(async (transaction) => {
         const { hash, to, blockHash, value, input, timestamp } = transaction;
+        let _value = value && value.toString();
         const transactionReceipt = await this.web3Service.getTransactionReceipt(
           hash.toString(),
           false,
         );
         const date = timestamp
           ? moment(timestamp * 1000)
-              .utc()
+              .utcOffset(480)
               .format('YYYY-MM-DD HH:mm:ss')
           : '';
         let title: string;
@@ -116,7 +117,27 @@ export class SipcTransactionService {
         } else {
           title = '支付';
         }
-        const { cumulativeGasUsed, gasUsed, status } = transactionReceipt;
+        const { cumulativeGasUsed, gasUsed, status, logs } = transactionReceipt;
+        if (
+          logs[0].topics[0] ===
+          '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
+        ) {
+          const parameter = '0x' + input.toString().slice(10);
+          const result = await this.web3Service.decodeParameters(
+            [
+              {
+                type: 'address',
+                name: 'to',
+              },
+              {
+                type: 'uint256',
+                name: 'value',
+              },
+            ],
+            parameter,
+          );
+          _value = result.value;
+        }
         return R.mergeRight(transaction, {
           cumulativeGasUsed,
           gasUsed,
@@ -127,7 +148,7 @@ export class SipcTransactionService {
           blockHash: blockHash && blockHash.toString(),
           hash: hash && hash.toString(),
           input: input && input.toString(),
-          value: value.toString(),
+          value: _value,
         });
       }),
     );
