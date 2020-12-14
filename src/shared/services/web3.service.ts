@@ -40,7 +40,7 @@ export class Web3Service {
   ) {}
 
   // 合约地址为空：查询主流币余额
-  async myBalanceOf(contract, wallet, f: boolean) {
+  async myBalanceOf(contract: string, wallet: string, f: boolean) {
     try {
       if (!contract) {
         const server = f ? this.web3 : this.sipc;
@@ -57,7 +57,7 @@ export class Web3Service {
     }
   }
 
-  async getDecimals(contract, f: boolean) {
+  async getDecimals(contract: string, f: boolean) {
     try {
       if (!contract) {
         return '18';
@@ -105,7 +105,7 @@ export class Web3Service {
     }
   }
 
-  async listenBlock(blockNumber) {
+  async listenBlock(blockNumber: number) {
     try {
       if (blockNumber % 10 === 0) {
         console.log('Get eth block ', blockNumber);
@@ -208,7 +208,7 @@ export class Web3Service {
       console.log('get ethBlock error:', blockNumber, e);
       blockNumber--;
     }
-
+    await sleep(500);
     await this.listenBlock(blockNumber + 1);
   }
 
@@ -219,7 +219,7 @@ export class Web3Service {
     this.listenBlockTransactions(number);
   }
 
-  async listenBlockTransactions(blockNumber) {
+  async listenBlockTransactions(blockNumber: number) {
     try {
       const currentHeight = await this.web3.eth.getBlockNumber();
       if (blockNumber > currentHeight) {
@@ -271,7 +271,7 @@ export class Web3Service {
       console.log('get ethTransactions error:', blockNumber, e);
       blockNumber--;
     }
-
+    await sleep(500);
     await this.listenBlockTransactions(blockNumber + 1);
   }
 
