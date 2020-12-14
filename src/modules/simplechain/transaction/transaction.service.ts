@@ -119,8 +119,9 @@ export class SipcTransactionService {
         }
         const { cumulativeGasUsed, gasUsed, status, logs } = transactionReceipt;
         if (
+          logs[0] &&
           logs[0].topics[0] ===
-          '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
+            '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
         ) {
           const parameter = '0x' + input.toString().slice(10);
           const result = await this.web3Service.decodeParameters(
