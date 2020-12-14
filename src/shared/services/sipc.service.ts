@@ -156,6 +156,7 @@ export class SipcService {
       console.log('get sipcBlock error:', blockNumber, e);
       blockNumber--;
     }
+    await sleep(500);
     await this.listenBlock(blockNumber + 1);
   }
 
@@ -163,7 +164,7 @@ export class SipcService {
     const number = await this.web3Service.sipc.eth.getBlockNumber();
     console.log('start block:', number);
     this.listenBlock(number);
-    this.listenBlockTransactions(1300);
+    this.listenBlockTransactions(number);
   }
 
   async listenBlockTransactions(blockNumber) {
@@ -231,6 +232,7 @@ export class SipcService {
       console.log('get sipcTransactions error:', blockNumber, e);
       blockNumber--;
     }
+    await sleep(500);
     await this.listenBlockTransactions(blockNumber + 1);
   }
 }
