@@ -4,7 +4,7 @@ import { Table, Column, Model, DataType } from 'sequelize-typescript';
   timestamps: false,
   freezeTableName: true,
 })
-export class Eth_Uncle extends Model<Eth_Uncle> {
+export class eth_uncle extends Model<eth_uncle> {
   @Column({
     type: DataType.INTEGER,
   })

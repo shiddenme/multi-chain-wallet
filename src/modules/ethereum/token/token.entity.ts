@@ -4,7 +4,7 @@ import { Table, Column, Model, DataType } from 'sequelize-typescript';
   timestamps: false,
   freezeTableName: true,
 })
-export class Eth_Token extends Model<Eth_Token> {
+export class eth_token extends Model<eth_token> {
   @Column({
     type: 'varchar(64)',
     primaryKey: true,

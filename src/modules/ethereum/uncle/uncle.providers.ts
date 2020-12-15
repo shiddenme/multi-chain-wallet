@@ -1,8 +1,8 @@
-import { Eth_Uncle } from './uncle.entity';
+import { eth_uncle } from './uncle.entity';
 
 export const EthUncleProviders = [
-    {
-      provide: 'eth_uncle_repo',
-      useValue: Eth_Uncle
-    }
-]
+  {
+    provide: 'eth_uncle_repo',
+    useValue: eth_uncle,
+  },
+];

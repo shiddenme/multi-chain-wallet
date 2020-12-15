@@ -1,7 +1,8 @@
-import { Sipc_Token } from './token.entity';
+import { sipc_token } from './token.entity';
 
-export const SipcTokenProviders = [{
-      provide: `sipc_token_repo`,
-      useValue: Sipc_Token
-    }
-]
+export const SipcTokenProviders = [
+  {
+    provide: `sipc_token_repo`,
+    useValue: sipc_token,
+  },
+];

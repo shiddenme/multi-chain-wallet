@@ -5,16 +5,15 @@ import {
   HttpException,
   Logger,
 } from '@nestjs/common';
-import { Eth_Transaction } from './transaction.entity';
+import { eth_transaction } from './transaction.entity';
 import { Cron } from '@nestjs/schedule';
 import * as R from 'ramda';
-import { Op } from 'sequelize';
+import { BOOLEAN, Op } from 'sequelize';
 import { Web3Service } from '../../../shared/services/web3.service';
 import { EthTokenService } from '../token/token.service';
 import * as moment from 'moment';
 import { ConfigService } from '../../../core';
 import { Sequelize } from 'sequelize-typescript';
-import { type } from 'os';
 
 @Injectable()
 export class EthTransactionService {
@@ -26,7 +25,7 @@ export class EthTransactionService {
     private readonly tokenService: EthTokenService,
     private readonly configService: ConfigService,
     @Inject('eth_transaction_repo')
-    private readonly transactionRepo: typeof Eth_Transaction,
+    private readonly transactionRepo: typeof eth_transaction,
   ) {}
 
   // todo: 为插入选项options 创建 DTO
@@ -60,19 +59,6 @@ export class EthTransactionService {
     if (!token) {
       throw new HttpException('代币不存在', 400);
     }
-    let foo: any;
-    // 如果合约地址为空；则查询主流币交易记录
-    if (token.contract === '') {
-      foo = {
-        type: 'EOA',
-      };
-    } else {
-      search = 'from';
-      foo = {
-        to: token.contract,
-        type: 'CALL',
-      };
-    }
 
     // todo :address 存redis
     const corssAddress = [
@@ -103,10 +89,9 @@ export class EthTransactionService {
     }
 
     const res = await this.transactionRepo.findAndCountAll({
-      where: R.mergeRight(options, foo),
-      attributes: {
-        exclude: ['gasUsed', 'status'],
-      },
+      where: R.mergeRight(options, {
+        contract: token.contract,
+      }),
       raw: true,
       order: [['timestamp', 'desc']],
       limit,
@@ -123,14 +108,11 @@ export class EthTransactionService {
           input,
           timestamp,
           to,
-          type,
+          status,
+          gasUsed,
           gasPrice,
         } = transaction;
-        let _value = value && value.toString();
-        const transactionReceipt = await this.web3Service.getTransactionReceipt(
-          hash.toString(),
-          true,
-        );
+
         const date = timestamp
           ? moment(timestamp * 1000)
               .utcOffset(480)
@@ -151,44 +133,18 @@ export class EthTransactionService {
         } else if (search === 'to') {
           mark = '+';
         }
-        const { cumulativeGasUsed, gasUsed, status, logs } = transactionReceipt;
-        // 判断是否为交易事件,交易事件value即为transfer函数的value参数
-        if (
-          logs[0] &&
-          logs[0].topics[0] ===
-            '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
-        ) {
-          const parameter = '0x' + input.toString().slice(10);
-          const result = await this.web3Service.decodeParameters(
-            [
-              {
-                type: 'address',
-                name: 'to',
-              },
-              {
-                type: 'uint256',
-                name: 'value',
-              },
-            ],
-            parameter,
-          );
-          _value = result.value;
-        }
-        const contract = type === 'EOA' ? '' : to;
-        const decimals = await this.web3Service.getDecimals(contract, true);
+
         return R.mergeRight(transaction, {
-          cumulativeGasUsed,
           title,
           gasUsed,
-          status,
+          status: Boolean(status),
           date,
           mark,
           blockHash: blockHash && blockHash.toString(),
           hash: hash && hash.toString(),
           input: input && input.toString(),
-          value: _value,
+          value: value.toString(),
           txnFee: gasPrice * gasUsed,
-          decimals,
         });
       }),
     );
@@ -206,13 +162,13 @@ export class EthTransactionService {
     };
   }
 
-  //定时每周创建以太坊交易表;
-  // @Cron('10 * * * * *')
+  // 定时每周创建以太坊交易表;
+  //@Cron('10 * * * * *')
   // async transactionDBCron() {
   //   await this.logger.log('create transaction table');
   //   const sequelize = new Sequelize(this.configService.get('sequelize'));
-  //   const Eth_Transaction_1 = Eth_Transaction;
-  //   sequelize.addModels([Eth_Transaction_1]);
+  //   const eth_transaction_1 = eth_transaction;
+  //   sequelize.addModels([eth_transaction_1]);
   //   await sequelize.sync({
   //     force: false,
   //     alter: false,

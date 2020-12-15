@@ -1,5 +1,5 @@
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
-import { Eth_Token } from './token.entity';
+import { eth_token } from './token.entity';
 import { ConfigService } from '../../../core';
 import * as R from 'ramda';
 import { Web3Service } from '../../../shared/services/web3.service';
@@ -8,7 +8,7 @@ import { Op } from 'sequelize';
 @Injectable()
 export class EthTokenService {
   constructor(
-    @Inject('eth_token_repo') private readonly tokenRepo: typeof Eth_Token,
+    @Inject('eth_token_repo') private readonly tokenRepo: typeof eth_token,
     @Inject(forwardRef(() => Web3Service))
     private readonly web3Service: Web3Service,
     private readonly config: ConfigService,

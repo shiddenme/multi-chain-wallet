@@ -1,8 +1,8 @@
-import { Sipc_Uncle } from './uncle.entity';
+import { sipc_uncle } from './uncle.entity';
 
 export const SipcUncleProviders = [
-    {
-      provide: 'sipc_uncle_repo',
-      useValue: Sipc_Uncle
-    }
-]
+  {
+    provide: 'sipc_uncle_repo',
+    useValue: sipc_uncle,
+  },
+];

@@ -1,16 +1,16 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { Sipc_Block_1, Sipc_Block_2, Sipc_Block_3 } from './block.entity';
+import { sipc_block_1, sipc_block_2, sipc_block_3 } from './block.entity';
 import { whickBlockRepo } from '../../../shared/utils/tools';
 import * as moment from 'moment';
 @Injectable()
 export class SipcBlockService {
   constructor(
     @Inject('sipc_block_repo_1')
-    private readonly blockRepo1: typeof Sipc_Block_1,
+    private readonly blockRepo1: typeof sipc_block_1,
     @Inject('sipc_block_repo_2')
-    private readonly blockRepo2: typeof Sipc_Block_2,
+    private readonly blockRepo2: typeof sipc_block_2,
     @Inject('sipc_block_repo_3')
-    private readonly blockRepo3: typeof Sipc_Block_3,
+    private readonly blockRepo3: typeof sipc_block_3,
   ) {}
   private readonly repoList = [
     this.blockRepo1,
@@ -19,7 +19,7 @@ export class SipcBlockService {
   ];
 
   // todo: 为插入选项options 创建 DTO
-  async findOne(options, repo: typeof Sipc_Block_1) {
+  async findOne(options, repo: typeof sipc_block_1) {
     return await repo.findOne(options);
   }
 

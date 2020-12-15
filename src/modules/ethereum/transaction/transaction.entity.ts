@@ -4,7 +4,7 @@ import { Table, Column, Model, DataType, Index } from 'sequelize-typescript';
   timestamps: false,
   freezeTableName: true,
 })
-export class Eth_Transaction extends Model<Eth_Transaction> {
+export class eth_transaction extends Model<eth_transaction> {
   @Column({
     type: 'varbinary(128)',
   })
@@ -22,7 +22,7 @@ export class Eth_Transaction extends Model<Eth_Transaction> {
   })
   public hash: BinaryType;
 
-  @Index('from_to_type_timestamp')
+  @Index('from_to_contract_timestamp')
   @Column({
     type: 'varchar(64)',
   })
@@ -43,7 +43,7 @@ export class Eth_Transaction extends Model<Eth_Transaction> {
   @Column({ type: DataType.BIGINT })
   public nonce: number;
 
-  @Index('from_to_type_timestamp')
+  @Index('from_to_contract_timestamp')
   @Column({ type: 'varchar(64)' })
   public to: string;
 
@@ -53,11 +53,14 @@ export class Eth_Transaction extends Model<Eth_Transaction> {
   @Column({ type: 'varbinary(32)' })
   public value: BinaryType;
 
-  @Index('from_to_type_timestamp')
-  @Column({ type: 'varchar(10)' })
-  public type: string;
+  @Index('from_to_contract_timestamp')
+  @Column({ type: 'varchar(64)' })
+  public contract: string;
 
-  @Index('from_to_type_timestamp')
+  @Index('from_to_contract_timestamp')
   @Column({ type: DataType.BIGINT })
   public timestamp: number;
+
+  @Column({ type: DataType.BOOLEAN })
+  public status: boolean;
 }

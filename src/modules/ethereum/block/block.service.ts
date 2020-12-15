@@ -1,13 +1,13 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { Eth_Block_1, Eth_Block_2, Eth_Block_3 } from './block.entity';
+import { eth_block_1, eth_block_2, eth_block_3 } from './block.entity';
 import { whickBlockRepo } from '../../../shared/utils/tools';
-import * as moment from 'moment';
+
 @Injectable()
 export class EthBlockService {
   constructor(
-    @Inject('eth_block_repo_1') private readonly blockRepo1: typeof Eth_Block_1,
-    @Inject('eth_block_repo_2') private readonly blockRepo2: typeof Eth_Block_2,
-    @Inject('eth_block_repo_3') private readonly blockRepo3: typeof Eth_Block_3,
+    @Inject('eth_block_repo_1') private readonly blockRepo1: typeof eth_block_1,
+    @Inject('eth_block_repo_2') private readonly blockRepo2: typeof eth_block_2,
+    @Inject('eth_block_repo_3') private readonly blockRepo3: typeof eth_block_3,
   ) {}
   private readonly repoList = [
     this.blockRepo1,
@@ -16,7 +16,7 @@ export class EthBlockService {
   ];
 
   // todo: 为插入选项options 创建 DTO
-  async findOne(options, repo: typeof Eth_Block_1) {
+  async findOne(options, repo: typeof eth_block_1) {
     return await repo.findOne(options);
   }
 

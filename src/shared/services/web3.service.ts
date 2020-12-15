@@ -77,13 +77,8 @@ export class Web3Service {
   }
 
   async getTransactionReceipt(hash: string, f: boolean) {
-    try {
-      const server = f ? this.web3 : this.sipc;
-      return await server.eth.getTransactionReceipt(hash);
-    } catch (e) {
-      console.log(e);
-      throw new HttpException('节点错误', 500);
-    }
+    const server = f ? this.web3 : this.sipc;
+    return await server.eth.getTransactionReceipt(hash);
   }
 
   async getGasPrice(f: boolean) {
@@ -224,37 +219,71 @@ export class Web3Service {
       raw: true,
       order: [['blockNumber', 'desc']],
     });
-    const blockNumber = res ? res.blockNumber : 11000000;
-    console.log('start block:', Math.min(number, blockNumber));
+    const blockNumber = res ? res.blockNumber : 11457187;
     //this.listenBlock(Math.max(number, 10000000));
-    this.listenBlockTransactions(Math.min(number, blockNumber));
+    this.listenBlockTransactions(blockNumber);
   }
 
   async listenBlockTransactions(blockNumber: number) {
     try {
       const currentHeight = await this.web3.eth.getBlockNumber();
       if (blockNumber % 10 === 0) {
-        console.log('Get eth transaction', blockNumber);
+        console.log('Get ETHEREUM transaction', blockNumber);
       }
+      // 确认12个块
       if (blockNumber > currentHeight) {
         setTimeout(async () => {
-          await this.listenBlockTransactions(blockNumber);
+          await this.listenBlockTransactions(blockNumber - 12);
         }, 1000);
         return false;
       }
       const result = await this.web3.eth.getBlock(blockNumber, true);
-      if (R.isNil(result)) {
-        return false;
-      }
+
       const timestamp = result.timestamp;
       const queue = [];
       for (let i = 0; i < result.transactions.length; i++) {
         const transaction = result.transactions[i];
-        transaction.type = transaction.input === '0x' ? 'EOA' : 'CALL';
-        (transaction.input === '0x' || transaction.input.length > 50000) &&
-          (transaction.input = '0x0');
-
+        const { input, hash, to } = transaction;
+        const code = await this.web3.eth.getCode(to);
+        transaction.contract = code === '0x' ? '0x' : to;
+        (input === '0x' || input.length > 50000) && (transaction.input = '0x0');
         transaction.timestamp = timestamp;
+        const transactionReceipt = await this.getTransactionReceipt(
+          hash.toString(),
+          true,
+        );
+        const { gasUsed, logs, status } = transactionReceipt;
+        transaction.gasUsed = gasUsed;
+        transaction.status = status;
+        // 如果是交易时间；to,value 赋值为tranfer函数的参数
+        if (
+          logs[0] &&
+          logs[0].topics[0] === this.config.get('web3')['transferEvent']
+        ) {
+          try {
+            const parameter = '0x' + input.slice(10);
+            const result = await this.decodeParameters(
+              [
+                {
+                  type: 'address',
+                  name: 'to',
+                },
+                {
+                  type: 'uint256',
+                  name: 'value',
+                },
+              ],
+              parameter,
+            );
+            if (result.value.length > 32) {
+              throw new Error('未验证合约');
+            }
+            transaction.value = result.value;
+            transaction.to = result.to;
+          } catch (e) {
+            continue;
+          }
+        }
         const transactionObj = R.pick([
           'blockHash',
           'blockNumber',
@@ -267,15 +296,16 @@ export class Web3Service {
           'to',
           'transactionIndex',
           'value',
-          'type',
+          'contract',
           'timestamp',
+          'gasUsed',
+          'status',
         ])(transaction);
         queue.push(
           this.ethTransactionService.findOrCreate(
             R.mergeRight(transactionObj, {
-              from:
-                transaction.from && transaction.from.toString().toLowerCase(),
-              to: transaction.to && transaction.to.toString().toLowerCase(),
+              from: transaction.from && transaction.from.toLowerCase(),
+              to: transaction.to && transaction.to.toLowerCase(),
             }),
           ),
         );
@@ -285,7 +315,7 @@ export class Web3Service {
       console.log('get ethTransactions error:', blockNumber, e);
       blockNumber--;
     }
-    await sleep(500);
+
     await this.listenBlockTransactions(blockNumber + 1);
   }
 

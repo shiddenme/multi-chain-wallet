@@ -1,8 +1,8 @@
-import { Eth_Transaction } from './transaction.entity';
+import { eth_transaction } from './transaction.entity';
 
 export const EthTransactionProviders = [
   {
     provide: `eth_transaction_repo`,
-    useValue: Eth_Transaction,
+    useValue: eth_transaction,
   },
 ];

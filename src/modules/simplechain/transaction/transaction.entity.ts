@@ -1,19 +1,16 @@
-import { Table, Column, Model, DataType } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, Index } from 'sequelize-typescript';
 
 @Table({
   timestamps: false,
   freezeTableName: true,
 })
-@Table({
-  timestamps: false,
-  freezeTableName: true,
-})
-export class Sipc_Transaction extends Model<Sipc_Transaction> {
+export class sipc_transaction extends Model<sipc_transaction> {
   @Column({
     type: 'varbinary(128)',
   })
   public blockHash: BinaryType;
 
+  @Index('blockNumber')
   @Column({
     type: DataType.INTEGER,
   })
@@ -25,6 +22,7 @@ export class Sipc_Transaction extends Model<Sipc_Transaction> {
   })
   public hash: BinaryType;
 
+  @Index('from_to_contract_timestamp')
   @Column({
     type: 'varchar(64)',
   })
@@ -45,6 +43,7 @@ export class Sipc_Transaction extends Model<Sipc_Transaction> {
   @Column({ type: DataType.BIGINT })
   public nonce: number;
 
+  @Index('from_to_contract_timestamp')
   @Column({ type: 'varchar(64)' })
   public to: string;
 
@@ -54,9 +53,14 @@ export class Sipc_Transaction extends Model<Sipc_Transaction> {
   @Column({ type: 'varbinary(32)' })
   public value: BinaryType;
 
-  @Column({ type: 'varchar(10)' })
-  public type: string;
+  @Index('from_to_contract_timestamp')
+  @Column({ type: 'varchar(64)' })
+  public contract: string;
 
+  @Index('from_to_contract_timestamp')
   @Column({ type: DataType.BIGINT })
   public timestamp: number;
+
+  @Column({ type: DataType.BOOLEAN })
+  public status: boolean;
 }

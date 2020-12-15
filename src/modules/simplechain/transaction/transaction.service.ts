@@ -1,5 +1,5 @@
 import { Injectable, Inject, forwardRef, HttpException } from '@nestjs/common';
-import { Sipc_Transaction } from './transaction.entity';
+import { sipc_transaction } from './transaction.entity';
 import * as R from 'ramda';
 import { Op } from 'sequelize';
 import { Web3Service } from '../../../shared/services/web3.service';
@@ -13,7 +13,7 @@ export class SipcTransactionService {
     private readonly web3Service: Web3Service,
     private readonly tokenService: SipcTokenService,
     @Inject('sipc_transaction_repo')
-    private readonly transactionRepo: typeof Sipc_Transaction,
+    private readonly transactionRepo: typeof sipc_transaction,
   ) {}
 
   // todo: 为插入选项options 创建 DTO
@@ -46,20 +46,12 @@ export class SipcTransactionService {
     if (!token) {
       throw new HttpException('代币不存在', 400);
     }
-    let foo: any;
-    // 如果合约地址为空；则查询主流币交易记录
-    if (token.contract === '') {
-      foo = {
-        type: 'EOA',
-      };
-    } else {
-      search = 'from';
-      foo = {
-        to: token.contract,
-        type: 'CALL',
-      };
-    }
 
+    // todo :address 存redis
+    const corssAddress = [
+      '0xf7bea9e8a0c8e99af6e52ff5e41ec9cac6e6c314',
+      '0x9363611fb9b9b2d6f731963c2ffa6cecf2ec0886',
+    ];
     const limit = Number(pageSize);
     const offset = pageIndex < 1 ? 0 : Number(pageIndex - 1) * Number(pageSize);
     let options: any;
@@ -84,39 +76,30 @@ export class SipcTransactionService {
     }
 
     const res = await this.transactionRepo.findAndCountAll({
-      where: R.mergeRight(options, foo),
-      attributes: {
-        exclude: ['gasUsed', 'status'],
-      },
+      where: R.mergeRight(options, {
+        contract: token.contract,
+      }),
       raw: true,
       order: [['timestamp', 'desc']],
       limit,
       offset,
     });
-
-    // todo 用redis存储
-    const corssAddress = [
-      '0xf7bea9e8a0c8e99af6e52ff5e41ec9cac6e6c314',
-      '0x9363611fb9b9b2d6f731963c2ffa6cecf2ec0886',
-    ];
     const { rows, count } = res;
+
     const transactions = await Promise.all(
       rows.map(async (transaction) => {
         const {
           hash,
-          to,
           blockHash,
           value,
           input,
           timestamp,
+          to,
+          status,
+          gasUsed,
           gasPrice,
-          type,
         } = transaction;
-        let _value = value && value.toString();
-        const transactionReceipt = await this.web3Service.getTransactionReceipt(
-          hash.toString(),
-          false,
-        );
+
         const date = timestamp
           ? moment(timestamp * 1000)
               .utcOffset(480)
@@ -137,43 +120,18 @@ export class SipcTransactionService {
         } else if (search === 'to') {
           mark = '+';
         }
-        const { cumulativeGasUsed, gasUsed, status, logs } = transactionReceipt;
-        if (
-          logs[0] &&
-          logs[0].topics[0] ===
-            '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
-        ) {
-          const parameter = '0x' + input.toString().slice(10);
-          const result = await this.web3Service.decodeParameters(
-            [
-              {
-                type: 'address',
-                name: 'to',
-              },
-              {
-                type: 'uint256',
-                name: 'value',
-              },
-            ],
-            parameter,
-          );
-          _value = result.value;
-        }
-        const contract = type === 'EOA' ? '' : to;
-        const decimals = await this.web3Service.getDecimals(contract, true);
+
         return R.mergeRight(transaction, {
-          cumulativeGasUsed,
+          title,
           gasUsed,
-          status,
+          status: Boolean(status),
           date,
           mark,
-          title,
           blockHash: blockHash && blockHash.toString(),
           hash: hash && hash.toString(),
           input: input && input.toString(),
-          value: _value,
+          value: value.toString(),
           txnFee: gasPrice * gasUsed,
-          decimals,
         });
       }),
     );

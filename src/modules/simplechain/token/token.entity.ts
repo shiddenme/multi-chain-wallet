@@ -4,7 +4,7 @@ import { Table, Column, Model, DataType } from 'sequelize-typescript';
   timestamps: false,
   freezeTableName: true,
 })
-export class Sipc_Token extends Model<Sipc_Token> {
+export class sipc_token extends Model<sipc_token> {
   @Column({
     type: 'varchar(64)',
     primaryKey: true,

@@ -4,7 +4,7 @@ import { Table, Column, Model, DataType } from 'sequelize-typescript';
   timestamps: false,
   freezeTableName: true,
 })
-class Sipc_Block extends Model<Sipc_Block> {
+class sipc_block extends Model<sipc_block> {
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
@@ -97,16 +97,16 @@ class Sipc_Block extends Model<Sipc_Block> {
   timestamps: false,
   freezeTableName: true,
 })
-export class Sipc_Block_1 extends Sipc_Block {}
+export class sipc_block_1 extends sipc_block {}
 
 @Table({
   timestamps: false,
   freezeTableName: true,
 })
-export class Sipc_Block_2 extends Sipc_Block {}
+export class sipc_block_2 extends sipc_block {}
 
 @Table({
   timestamps: false,
   freezeTableName: true,
 })
-export class Sipc_Block_3 extends Sipc_Block {}
+export class sipc_block_3 extends sipc_block {}

@@ -1,5 +1,5 @@
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
-import { Sipc_Token } from './token.entity';
+import { sipc_token } from './token.entity';
 import { Web3Service } from '../../../shared/services/web3.service';
 import * as R from 'ramda';
 import { Op } from 'sequelize';
@@ -14,7 +14,7 @@ class findTokenDto {
 @Injectable()
 export class SipcTokenService {
   constructor(
-    @Inject('sipc_token_repo') private readonly tokenRepo: typeof Sipc_Token,
+    @Inject('sipc_token_repo') private readonly tokenRepo: typeof sipc_token,
     @Inject(forwardRef(() => Web3Service))
     private readonly web3Service: Web3Service,
     private readonly config: ConfigService,
