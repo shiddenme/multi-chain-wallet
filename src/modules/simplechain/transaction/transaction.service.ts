@@ -110,6 +110,7 @@ export class SipcTransactionService {
           input,
           timestamp,
           gasPrice,
+          type,
         } = transaction;
         let _value = value && value.toString();
         const transactionReceipt = await this.web3Service.getTransactionReceipt(
@@ -158,6 +159,8 @@ export class SipcTransactionService {
           );
           _value = result.value;
         }
+        const contract = type === 'EOA' ? '' : to;
+        const decimals = await this.web3Service.getDecimals(contract, true);
         return R.mergeRight(transaction, {
           cumulativeGasUsed,
           gasUsed,
@@ -170,6 +173,7 @@ export class SipcTransactionService {
           input: input && input.toString(),
           value: _value,
           txnFee: gasPrice * gasUsed,
+          decimals,
         });
       }),
     );

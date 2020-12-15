@@ -14,6 +14,7 @@ import { EthTokenService } from '../token/token.service';
 import * as moment from 'moment';
 import { ConfigService } from '../../../core';
 import { Sequelize } from 'sequelize-typescript';
+import { type } from 'os';
 
 @Injectable()
 export class EthTransactionService {
@@ -122,6 +123,7 @@ export class EthTransactionService {
           input,
           timestamp,
           to,
+          type,
           gasPrice,
         } = transaction;
         let _value = value && value.toString();
@@ -150,7 +152,7 @@ export class EthTransactionService {
           mark = '+';
         }
         const { cumulativeGasUsed, gasUsed, status, logs } = transactionReceipt;
-        // 判断是否为交易事件
+        // 判断是否为交易事件,交易事件value即为transfer函数的value参数
         if (
           logs[0] &&
           logs[0].topics[0] ===
@@ -172,6 +174,8 @@ export class EthTransactionService {
           );
           _value = result.value;
         }
+        const contract = type === 'EOA' ? '' : to;
+        const decimals = await this.web3Service.getDecimals(contract, true);
         return R.mergeRight(transaction, {
           cumulativeGasUsed,
           title,
@@ -184,6 +188,7 @@ export class EthTransactionService {
           input: input && input.toString(),
           value: _value,
           txnFee: gasPrice * gasUsed,
+          decimals,
         });
       }),
     );
@@ -201,6 +206,7 @@ export class EthTransactionService {
     };
   }
 
+  //定时每周创建以太坊交易表;
   // @Cron('10 * * * * *')
   // async transactionDBCron() {
   //   await this.logger.log('create transaction table');
