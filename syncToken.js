@@ -7,12 +7,12 @@ const connnect = mysql.createConnection({
     database: 'multi_chain_wallet'
 })
 
-const tokens = require('./eth_token')
+const tokens = require('./eth_token.js')
 function spider() { 
 
     tokens.forEach((token) =>{ 
         const {contract,symbol,icon,name,price,sort } = token;
-        connnect.execute(`replace into eth_token(contract,symbol,icon,name,sort,price) 
+        connnect.execute(`insert into eth_token(contract,symbol,icon,name,sort,price) 
         values('${contract}','${symbol}','${icon}','${name}',${sort},${price})`, function (err,res) { 
                 if (!err) {
                     console.log('success',sort)
