@@ -218,14 +218,24 @@ export class Web3Service {
 
   async syncBlocks() {
     const number = await this.web3.eth.getBlockNumber();
-    console.log('start block:', number);
-    this.listenBlock(Math.max(number, 10000000));
-    this.listenBlockTransactions(number);
+    const res = await this.ethTransactionService.findOne({
+      attribute: ['blockNumber'],
+      limit: 1,
+      raw: true,
+      order: [['blockNumber', 'desc']],
+    });
+    const blockNumber = res ? res.blockNumber : 11000000;
+    console.log('start block:', Math.min(number, blockNumber));
+    //this.listenBlock(Math.max(number, 10000000));
+    this.listenBlockTransactions(Math.min(number, blockNumber));
   }
 
   async listenBlockTransactions(blockNumber: number) {
     try {
       const currentHeight = await this.web3.eth.getBlockNumber();
+      if (blockNumber % 10 === 0) {
+        console.log('Get eth transaction', blockNumber);
+      }
       if (blockNumber > currentHeight) {
         setTimeout(async () => {
           await this.listenBlockTransactions(blockNumber);
@@ -275,7 +285,6 @@ export class Web3Service {
       console.log('get ethTransactions error:', blockNumber, e);
       blockNumber--;
     }
-    await sleep(500);
     await this.listenBlockTransactions(blockNumber + 1);
   }
 
