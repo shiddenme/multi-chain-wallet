@@ -201,15 +201,15 @@ export class EthTransactionService {
     };
   }
 
-  @Cron('10 * * * * *')
-  async transactionDBCron() {
-    await this.logger.log('create transaction table');
-    const sequelize = new Sequelize(this.configService.get('sequelize'));
-    const Eth_Transaction_1 = Eth_Transaction;
-    sequelize.addModels([Eth_Transaction_1]);
-    await sequelize.sync({
-      force: false,
-      alter: false,
-    });
-  }
+  // @Cron('10 * * * * *')
+  // async transactionDBCron() {
+  //   await this.logger.log('create transaction table');
+  //   const sequelize = new Sequelize(this.configService.get('sequelize'));
+  //   const Eth_Transaction_1 = Eth_Transaction;
+  //   sequelize.addModels([Eth_Transaction_1]);
+  //   await sequelize.sync({
+  //     force: false,
+  //     alter: false,
+  //   });
+  // }
 }
