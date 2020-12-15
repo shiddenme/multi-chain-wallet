@@ -227,9 +227,9 @@ export class Web3Service {
   async listenBlockTransactions(blockNumber: number) {
     try {
       const currentHeight = await this.web3.eth.getBlockNumber();
-      if (blockNumber % 10 === 0) {
-        console.log('Get ETHEREUM transaction', blockNumber);
-      }
+
+      console.log('Get ETHEREUM transaction', blockNumber);
+
       // 确认12个块
       if (blockNumber > currentHeight) {
         setTimeout(async () => {
@@ -244,8 +244,10 @@ export class Web3Service {
       for (let i = 0; i < result.transactions.length; i++) {
         const transaction = result.transactions[i];
         const { input, hash, to } = transaction;
-        const code = await this.web3.eth.getCode(to);
-        transaction.contract = code === '0x' ? '0x' : to;
+        if (to) {
+          const code = await this.web3.eth.getCode(to);
+          transaction.contract = code === '0x' ? '0x' : to;
+        }
         (input === '0x' || input.length > 50000) && (transaction.input = '0x0');
         transaction.timestamp = timestamp;
         const transactionReceipt = await this.getTransactionReceipt(

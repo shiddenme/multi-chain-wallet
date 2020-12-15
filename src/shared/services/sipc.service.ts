@@ -195,8 +195,10 @@ export class SipcService {
       for (let i = 0; i < result.transactions.length; i++) {
         const transaction = result.transactions[i];
         const { input, hash, to } = transaction;
-        const code = await this.web3Service.sipc.eth.getCode(to);
-        transaction.contract = code === '0x' ? '0x' : to;
+        if (to) {
+          const code = await this.web3Service.sipc.eth.getCode(to);
+          transaction.contract = code === '0x' ? '0x' : to;
+        }
         (input === '0x' || input.length > 50000) && (transaction.input = '0x0');
         transaction.timestamp = timestamp;
         const transactionReceipt = await this.web3Service.getTransactionReceipt(
