@@ -285,6 +285,7 @@ export class Web3Service {
       console.log('get ethTransactions error:', blockNumber, e);
       blockNumber--;
     }
+    await sleep(500);
     await this.listenBlockTransactions(blockNumber + 1);
   }
 
