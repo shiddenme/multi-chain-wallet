@@ -21,7 +21,7 @@ export const databaseProviders = [
         ]),
       );
       await sequelize.sync({
-        force: true,
+        force: false,
         alter: false,
       });
       return sequelize;
