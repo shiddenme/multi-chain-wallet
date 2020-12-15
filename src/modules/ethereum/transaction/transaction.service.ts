@@ -1,14 +1,22 @@
-import { Injectable, Inject, forwardRef, HttpException } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  forwardRef,
+  HttpException,
+  Logger,
+} from '@nestjs/common';
 import { Eth_Transaction } from './transaction.entity';
-
+import { Cron } from '@nestjs/schedule';
 import * as R from 'ramda';
 import { Op } from 'sequelize';
 import { Web3Service } from '../../../shared/services/web3.service';
 import { EthTokenService } from '../token/token.service';
-
 import * as moment from 'moment';
+
 @Injectable()
 export class EthTransactionService {
+  private readonly logger = new Logger(EthTransactionService.name);
+
   constructor(
     @Inject(forwardRef(() => Web3Service))
     private readonly web3Service: Web3Service,
@@ -97,7 +105,15 @@ export class EthTransactionService {
 
     const transactions = await Promise.all(
       rows.map(async (transaction) => {
-        const { hash, blockHash, value, input, timestamp, to } = transaction;
+        const {
+          hash,
+          blockHash,
+          value,
+          input,
+          timestamp,
+          to,
+          gasPrice,
+        } = transaction;
         let _value = value && value.toString();
         const transactionReceipt = await this.web3Service.getTransactionReceipt(
           hash.toString(),
@@ -117,6 +133,11 @@ export class EthTransactionService {
           title = '跨链';
         } else {
           title = '支付';
+        }
+        if (search === 'from') {
+          mark = '-';
+        } else if (search === 'to') {
+          mark = '+';
         }
         const { cumulativeGasUsed, gasUsed, status, logs } = transactionReceipt;
         // 判断是否为交易事件
@@ -152,6 +173,7 @@ export class EthTransactionService {
           hash: hash && hash.toString(),
           input: input && input.toString(),
           value: _value,
+          txnFee: 1145073000 * 1145071000,
         });
       }),
     );
@@ -167,5 +189,10 @@ export class EthTransactionService {
     return {
       transfer,
     };
+  }
+
+  @Cron('5 * * * * *')
+  async transactionDBCron() {
+    // this.logger.debug('Called when the current second is 45');
   }
 }

@@ -96,7 +96,15 @@ export class SipcTransactionService {
     const { rows, count } = res;
     const transactions = await Promise.all(
       rows.map(async (transaction) => {
-        const { hash, to, blockHash, value, input, timestamp } = transaction;
+        const {
+          hash,
+          to,
+          blockHash,
+          value,
+          input,
+          timestamp,
+          gasPrice,
+        } = transaction;
         let _value = value && value.toString();
         const transactionReceipt = await this.web3Service.getTransactionReceipt(
           hash.toString(),
@@ -116,6 +124,11 @@ export class SipcTransactionService {
           title = '跨链';
         } else {
           title = '支付';
+        }
+        if (search === 'from') {
+          mark = '-';
+        } else if (search === 'to') {
+          mark = '+';
         }
         const { cumulativeGasUsed, gasUsed, status, logs } = transactionReceipt;
         if (
@@ -150,6 +163,7 @@ export class SipcTransactionService {
           hash: hash && hash.toString(),
           input: input && input.toString(),
           value: _value,
+          txnFee: gasPrice * gasUsed,
         });
       }),
     );
