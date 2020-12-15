@@ -12,6 +12,8 @@ import { Op } from 'sequelize';
 import { Web3Service } from '../../../shared/services/web3.service';
 import { EthTokenService } from '../token/token.service';
 import * as moment from 'moment';
+import { ConfigService } from '../../../core';
+import { Sequelize } from 'sequelize-typescript';
 
 @Injectable()
 export class EthTransactionService {
@@ -21,6 +23,7 @@ export class EthTransactionService {
     @Inject(forwardRef(() => Web3Service))
     private readonly web3Service: Web3Service,
     private readonly tokenService: EthTokenService,
+    private readonly configService: ConfigService,
     @Inject('eth_transaction_repo')
     private readonly transactionRepo: typeof Eth_Transaction,
   ) {}
@@ -70,6 +73,7 @@ export class EthTransactionService {
       };
     }
 
+    // todo :address 存redis
     const corssAddress = [
       '0xf7bea9e8a0c8e99af6e52ff5e41ec9cac6e6c314',
       '0x9363611fb9b9b2d6f731963c2ffa6cecf2ec0886',
@@ -80,9 +84,15 @@ export class EthTransactionService {
     if (search === 'from') {
       options = {
         from: wallet,
+        to: {
+          [Op.not]: null,
+        },
       };
     } else if (search === 'to') {
       options = {
+        from: {
+          [Op.not]: null,
+        },
         to: wallet,
       };
     } else {
@@ -191,8 +201,15 @@ export class EthTransactionService {
     };
   }
 
-  @Cron('5 * * * * *')
+  @Cron('10 * * * * *')
   async transactionDBCron() {
-    // this.logger.debug('Called when the current second is 45');
+    await this.logger.log('create transaction table');
+    const sequelize = new Sequelize(this.configService.get('sequelize'));
+    const Eth_Transaction_1 = Eth_Transaction;
+    sequelize.addModels([Eth_Transaction_1]);
+    await sequelize.sync({
+      force: false,
+      alter: false,
+    });
   }
 }

@@ -156,20 +156,29 @@ export class SipcService {
       console.log('get sipcBlock error:', blockNumber, e);
       blockNumber--;
     }
-    await sleep(500);
     await this.listenBlock(blockNumber + 1);
   }
 
   async syncBlocks() {
     const number = await this.web3Service.sipc.eth.getBlockNumber();
-    console.log('start block:', number);
-    this.listenBlock(number);
-    this.listenBlockTransactions(number);
+    const res = await this.sipcTransactionService.findOne({
+      attribute: ['blockNumber'],
+      limit: 1,
+      raw: true,
+      order: [['blockNumber', 'desc']],
+    });
+    const blockNumber = res ? res.blockNumber : 11000000;
+    console.log('start block:', Math.min(number, blockNumber));
+    //this.listenBlock(Math.max(number, 10000000));
+    this.listenBlockTransactions(Math.min(number, blockNumber));
   }
 
   async listenBlockTransactions(blockNumber) {
     try {
       const currentHeight = await this.web3Service.sipc.eth.getBlockNumber();
+      if (blockNumber % 10 === 0) {
+        console.log('Get sipc transaction ', blockNumber);
+      }
       if (blockNumber > currentHeight) {
         setTimeout(async () => {
           await this.listenBlockTransactions(blockNumber);

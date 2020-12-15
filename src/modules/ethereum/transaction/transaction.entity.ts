@@ -1,9 +1,5 @@
-import { Table, Column, Model, DataType } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, Index } from 'sequelize-typescript';
 
-@Table({
-  timestamps: false,
-  freezeTableName: true,
-})
 @Table({
   timestamps: false,
   freezeTableName: true,
@@ -14,6 +10,7 @@ export class Eth_Transaction extends Model<Eth_Transaction> {
   })
   public blockHash: BinaryType;
 
+  @Index('blockNumber')
   @Column({
     type: DataType.INTEGER,
   })
@@ -25,6 +22,7 @@ export class Eth_Transaction extends Model<Eth_Transaction> {
   })
   public hash: BinaryType;
 
+  @Index('from_to_type_timestamp')
   @Column({
     type: 'varchar(64)',
   })
@@ -45,6 +43,7 @@ export class Eth_Transaction extends Model<Eth_Transaction> {
   @Column({ type: DataType.BIGINT })
   public nonce: number;
 
+  @Index('from_to_type_timestamp')
   @Column({ type: 'varchar(64)' })
   public to: string;
 
@@ -54,9 +53,11 @@ export class Eth_Transaction extends Model<Eth_Transaction> {
   @Column({ type: 'varbinary(32)' })
   public value: BinaryType;
 
+  @Index('from_to_type_timestamp')
   @Column({ type: 'varchar(10)' })
   public type: string;
 
+  @Index('from_to_type_timestamp')
   @Column({ type: DataType.BIGINT })
   public timestamp: number;
 }
