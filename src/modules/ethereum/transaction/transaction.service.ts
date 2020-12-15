@@ -173,7 +173,7 @@ export class EthTransactionService {
           hash: hash && hash.toString(),
           input: input && input.toString(),
           value: _value,
-          txnFee: 1145073000 * 1145071000,
+          txnFee: gasPrice * gasUsed,
         });
       }),
     );
