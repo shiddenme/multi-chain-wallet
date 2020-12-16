@@ -70,7 +70,7 @@ export class EthTokenService {
         const balance = await this.web3Service.myBalanceOf(
           contract,
           wallet,
-          true,
+          'eth',
         );
         const decimals = await this.web3Service.getDecimals(contract, true);
         const gasPrice = await this.web3Service.getGasPrice(true);

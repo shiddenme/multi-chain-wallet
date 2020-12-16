@@ -68,12 +68,14 @@ export class SipcTokenService {
 
     const tokens = await Promise.all(
       res.map(async (token) => {
-        const { contract } = token;
+        const { contract, symbol } = token;
+        const node = symbol === 'SLC' ? 'slc' : 'sipc';
         const balance = await this.web3Service.myBalanceOf(
           contract,
           wallet,
-          false,
+          node,
         );
+
         const gasPrice = await this.web3Service.getGasPrice(false);
         const decimals = await this.web3Service.getDecimals(contract, false);
         return R.mergeRight(token, {

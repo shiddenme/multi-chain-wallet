@@ -11,6 +11,7 @@ export default {
     gethServer: 'http://8.210.111.37:8545',
     reconnect: 5000,
     sipcServer: 'https://explorer.simplechain.com/rpc',
+    slcServer: 'http://101.68.74.171:8555',
     transferEvent:
       '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
   },

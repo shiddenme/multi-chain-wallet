@@ -32,6 +32,9 @@ export class Web3Service {
   public readonly sipc = new Web3(
     new Web3.providers.HttpProvider(this.config.get('web3')['sipcServer']),
   );
+  public readonly slc = new Web3(
+    new Web3.providers.HttpProvider(this.config.get('web3')['slcServer']),
+  );
 
   public readonly web3Contract = new this.web3.eth.Contract(erc20AbI);
   public readonly sipcContract = new this.sipc.eth.Contract(erc20AbI);
@@ -43,15 +46,32 @@ export class Web3Service {
     private readonly config: ConfigService,
   ) {}
 
+  switchServer(node: string) {
+    let s = null;
+    switch (node) {
+      case 'sipc':
+        s = this.sipc;
+        break;
+      case 'slc':
+        s = this.slc;
+        break;
+      case 'eth':
+        s = this.web3;
+        break;
+      default:
+        break;
+    }
+    return s;
+  }
   // 合约地址为空：查询主流币余额
-  async myBalanceOf(contract: string, wallet: string, f: boolean) {
+  async myBalanceOf(contract: string, wallet: string, node: string) {
     try {
+      const server = this.switchServer(node);
       if (!contract || contract === '0x') {
-        const server = f ? this.web3 : this.sipc;
         const value = await server.eth.getBalance(wallet);
         return value;
       }
-      const myContract = f ? this.web3Contract : this.sipcContract;
+      const myContract = new server.eth.Contract(erc20AbI);
       myContract.options.address = contract;
 
       return await myContract.methods.balanceOf(wallet).call();
