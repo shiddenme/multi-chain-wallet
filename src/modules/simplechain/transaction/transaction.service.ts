@@ -77,7 +77,7 @@ export class SipcTransactionService {
 
     const res = await this.transactionRepo.findAndCountAll({
       where: R.mergeRight(options, {
-        contract: token.contract,
+        contract: token.contract || '0x',
       }),
       raw: true,
       order: [['timestamp', 'desc']],

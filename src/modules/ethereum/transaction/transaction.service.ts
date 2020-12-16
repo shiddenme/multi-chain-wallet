@@ -13,7 +13,7 @@ import { Web3Service } from '../../../shared/services/web3.service';
 import { EthTokenService } from '../token/token.service';
 import * as moment from 'moment';
 import { ConfigService } from '../../../core';
-import { Sequelize } from 'sequelize-typescript';
+import { Sequelize, Table } from 'sequelize-typescript';
 
 @Injectable()
 export class EthTransactionService {
@@ -90,7 +90,7 @@ export class EthTransactionService {
 
     const res = await this.transactionRepo.findAndCountAll({
       where: R.mergeRight(options, {
-        contract: token.contract,
+        contract: token.contract || '0x',
       }),
       raw: true,
       order: [['timestamp', 'desc']],
@@ -163,15 +163,20 @@ export class EthTransactionService {
   }
 
   // 定时每周创建以太坊交易表;
-  // @Cron('10 * * * * *')
-  // async transactionDBCron() {
-  //   await this.logger.log('create transaction table');
-  //   const sequelize = new Sequelize(this.configService.get('sequelize'));
-  //   class eth_transaction_1 extends eth_transaction {}
-  //   sequelize.addModels([eth_transaction_1]);
-  //   await sequelize.sync({
-  //     force: false,
-  //     alter: false,
-  //   });
-  // }
+  @Cron('0 0 8 * * 4')
+  async transactionDBCron() {
+    await this.logger.log('create transaction table');
+    const sequelize = new Sequelize(this.configService.get('sequelize'));
+
+    @Table({
+      timestamps: false,
+      freezeTableName: true,
+    })
+    class eth_transaction_1 extends eth_transaction {}
+    sequelize.addModels([eth_transaction_1]);
+    await sequelize.sync({
+      force: false,
+      alter: false,
+    });
+  }
 }

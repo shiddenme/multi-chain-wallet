@@ -46,7 +46,7 @@ export class Web3Service {
   // 合约地址为空：查询主流币余额
   async myBalanceOf(contract: string, wallet: string, f: boolean) {
     try {
-      if (contract === '0x') {
+      if (!contract || contract === '0x') {
         const server = f ? this.web3 : this.sipc;
         const value = await server.eth.getBalance(wallet);
         return value;
@@ -63,7 +63,7 @@ export class Web3Service {
 
   async getDecimals(contract: string, f: boolean) {
     try {
-      if (contract === '0x') {
+      if (!contract || contract === '0x') {
         return '18';
       }
       const myContract = f ? this.web3Contract : this.sipcContract;
