@@ -163,11 +163,11 @@ export class EthTransactionService {
   }
 
   // 定时每周创建以太坊交易表;
-  //@Cron('10 * * * * *')
+  // @Cron('10 * * * * *')
   // async transactionDBCron() {
   //   await this.logger.log('create transaction table');
   //   const sequelize = new Sequelize(this.configService.get('sequelize'));
-  //   const eth_transaction_1 = eth_transaction;
+  //   class eth_transaction_1 extends eth_transaction {}
   //   sequelize.addModels([eth_transaction_1]);
   //   await sequelize.sync({
   //     force: false,

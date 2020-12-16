@@ -167,7 +167,7 @@ export class SipcService {
       raw: true,
       order: [['blockNumber', 'desc']],
     });
-    const blockNumber = res ? res.blockNumber : 4800000;
+    const blockNumber = res ? res.blockNumber : 4866412;
     //this.listenBlock(Math.max(number, 10000000));
     this.listenBlockTransactions(blockNumber);
   }
