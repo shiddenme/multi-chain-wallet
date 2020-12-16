@@ -13,7 +13,6 @@ export class TransformInterceptor implements NestInterceptor {
     context: ExecutionContext,
     next: CallHandler,
   ): Observable<any> {
-    const req = context.getArgByIndex(1).req;
     return next.handle().pipe(
       map((data) => {
         return {

@@ -10,3 +10,5 @@ export function fromWei(wei: string | null, unit: string) {
 
   return web3.utils.fromWei(wei, unit);
 }
+
+export function distributeTable(from: string, to: string) {}

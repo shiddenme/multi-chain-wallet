@@ -61,11 +61,7 @@ export class SipcTokenService {
   async findAsset(where) {
     const { wallet, names } = where;
     const res = await this.tokenRepo.findAll({
-      where: {
-        name: {
-          [Op.in]: ['SimpleChain'].concat(names.split(',')),
-        },
-      },
+      where: {},
       raw: true,
       order: [['sort', 'asc']],
     });

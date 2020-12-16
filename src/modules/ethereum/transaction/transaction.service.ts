@@ -14,7 +14,7 @@ import { EthTokenService } from '../token/token.service';
 import * as moment from 'moment';
 import { ConfigService } from '../../../core';
 import { Sequelize, Table } from 'sequelize-typescript';
-import { getWeekYear } from '../../../shared/utils/time';
+
 @Injectable()
 export class EthTransactionService {
   private readonly logger = new Logger(EthTransactionService.name);
@@ -152,23 +152,4 @@ export class EthTransactionService {
       transfer,
     };
   }
-
-  // 定时每周日下午5点创建以太坊交易表;
-  // @Cron('0 0 17 * * 7')
-  // async transactionDBCron() {
-  //   await this.logger.log('create transaction table');
-  //   const sequelize = new Sequelize(this.configService.get('sequelize'));
-  //   const weekYear = getWeekYear(true);
-  //   @Table({
-  //     timestamps: false,
-  //     freezeTableName: true,
-  //     tableName: `eth_transaction_${weekYear}`,
-  //   })
-  //   class eth_transaction_1 extends eth_transaction {}
-  //   sequelize.addModels([eth_transaction_1]);
-  //   await sequelize.sync({
-  //     force: false,
-  //     alter: false,
-  //   });
-  // }
 }
