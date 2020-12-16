@@ -8,7 +8,7 @@ import {
 import { eth_transaction } from './transaction.entity';
 import { Cron } from '@nestjs/schedule';
 import * as R from 'ramda';
-import { BOOLEAN, Op } from 'sequelize';
+import { Op } from 'sequelize';
 import { Web3Service } from '../../../shared/services/web3.service';
 import { EthTokenService } from '../token/token.service';
 import * as moment from 'moment';
