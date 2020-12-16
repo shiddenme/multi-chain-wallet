@@ -154,21 +154,21 @@ export class EthTransactionService {
   }
 
   // 定时每周日下午5点创建以太坊交易表;
-  @Cron('0 0 17 * * 7')
-  async transactionDBCron() {
-    await this.logger.log('create transaction table');
-    const sequelize = new Sequelize(this.configService.get('sequelize'));
-    const weekYear = getWeekYear(true);
-    @Table({
-      timestamps: false,
-      freezeTableName: true,
-      tableName: `eth_transaction_${weekYear}`,
-    })
-    class eth_transaction_1 extends eth_transaction {}
-    sequelize.addModels([eth_transaction_1]);
-    await sequelize.sync({
-      force: false,
-      alter: false,
-    });
-  }
+  // @Cron('0 0 17 * * 7')
+  // async transactionDBCron() {
+  //   await this.logger.log('create transaction table');
+  //   const sequelize = new Sequelize(this.configService.get('sequelize'));
+  //   const weekYear = getWeekYear(true);
+  //   @Table({
+  //     timestamps: false,
+  //     freezeTableName: true,
+  //     tableName: `eth_transaction_${weekYear}`,
+  //   })
+  //   class eth_transaction_1 extends eth_transaction {}
+  //   sequelize.addModels([eth_transaction_1]);
+  //   await sequelize.sync({
+  //     force: false,
+  //     alter: false,
+  //   });
+  // }
 }
