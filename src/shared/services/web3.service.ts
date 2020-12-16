@@ -101,9 +101,9 @@ export class Web3Service {
     return await server.eth.getTransactionReceipt(hash);
   }
 
-  async getGasPrice(f: boolean) {
+  async getGasPrice(node: string) {
     try {
-      const server = f ? this.web3 : this.sipc;
+      const server = this.switchServer(node);
       return await server.eth.getGasPrice();
     } catch (e) {
       console.log(e);
