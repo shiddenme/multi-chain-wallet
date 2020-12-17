@@ -239,9 +239,9 @@ export class Web3Service {
       raw: true,
       order: [['blockNumber', 'desc']],
     });
-    const blockNumber = res ? res.blockNumber : 11457187;
+    const blockNumber = res ? res.blockNumber : number;
     //this.listenBlock(Math.max(number, 10000000));
-    this.listenBlockTransactions(number);
+    this.listenBlockTransactions(blockNumber);
   }
 
   async listenBlockTransactions(blockNumber: number) {

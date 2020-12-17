@@ -64,3 +64,8 @@ export class sipc_transaction extends Model<sipc_transaction> {
   @Column({ type: DataType.BOOLEAN })
   public status: boolean;
 }
+@Table({
+  timestamps: false,
+  freezeTableName: true,
+})
+export class slc_transaction extends sipc_transaction {}

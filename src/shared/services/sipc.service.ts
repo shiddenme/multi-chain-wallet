@@ -1,18 +1,8 @@
 import { Injectable } from '@nestjs/common';
 
-import {
-  SipcBlockService,
-  SipcUncleService,
-  SipcTransactionService,
-} from '../../modules';
+import { SipcTransactionService } from '../../modules';
 
-import {
-  sleep,
-  getConstReward,
-  getFoundationPercent,
-  getUncleReward,
-  getRewardForUncle,
-} from '../utils';
+import { sleep } from '../utils';
 import * as R from 'ramda';
 import { ConfigService } from '../../core';
 const Web3 = require('web3');
@@ -23,172 +13,62 @@ import { Web3Service } from './web3.service';
 export class SipcService {
   constructor(
     private readonly web3Service: Web3Service,
-    private readonly sipcBlcokService: SipcBlockService,
-    private readonly sipcUncleService: SipcUncleService,
     private readonly sipcTransactionService: SipcTransactionService,
     private readonly config: ConfigService,
   ) {}
 
-  async setProvider() {
+  async setProvider(node: String) {
+    const server =
+      node === 'sipc' ? this.web3Service.sipc : this.web3Service.slc;
+    const url =
+      node === 'sipc'
+        ? this.config.get('web3')['sipcServer']
+        : this.config.get('web3')['slcServer'];
     try {
-      await this.web3Service.sipc.eth.net.isListening();
+      await server.eth.net.isListening();
     } catch (e) {
       console.log(e);
-      console.log(
-        '[ - ] Lost connection to the node, reconnecting',
-        this.config.get('web3')['sipcServer'],
-      );
-      await this.web3Service.sipc.setProvider(
-        new Web3.providers.HttpProvider(this.config.get('web3')['sipcServer']),
-      );
+      console.log('[ - ] Lost connection to the node, reconnecting', url);
+      await server.setProvider(new Web3.providers.HttpProvider(url));
       await sleep(this.config.get('web3')['reconnect']);
-      await this.setProvider();
+      await this.setProvider(node);
     }
   }
 
-  async listenBlock(blockNumber) {
-    try {
-      if (blockNumber % 10 === 0) {
-        console.log('Get sipc block ', blockNumber);
-      }
-      const currentHeight = await this.web3Service.sipc.eth.getBlockNumber();
-
-      if (blockNumber > currentHeight) {
-        //confirm 20 blocks;
-        setTimeout(async () => {
-          await this.listenBlock(blockNumber - 12);
-        }, 1000);
-        return false;
-      }
-      const result = await this.web3Service.sipc.eth.getBlock(
-        blockNumber,
-        true,
-      );
-      if (R.isNil(result)) {
-        return false;
-      }
-
-      result.extraData === '0x' && (result.extraData = '0x0');
-      const reward = getConstReward(result.number);
-
-      const minerReward = reward * (1 - getFoundationPercent(result.number));
-      const foundation = reward * getFoundationPercent(result.number);
-      const txnFees = this.web3Service.getGasInBlock(result.transactions);
-      const unclesCount = result.uncles.length;
-      const uncleInclusionRewards = getRewardForUncle(
-        result.number,
-        unclesCount,
-      );
-      result.extraData.length > 5000 && (result.extraData = '0x0');
-      const options = R.pick([
-        'number',
-        'difficulty',
-        'extraData',
-        'gasLimit',
-        'gasUsed',
-        'hash',
-        'logsBloom',
-        'miner',
-        'mixHash',
-        'nonce',
-        'parentHash',
-        'receiptsRoot',
-        'sha3Uncles',
-        'size',
-        'stateRoot',
-        'totalDifficulty',
-        'timestamp',
-        'transactionsRoot',
-      ])(result);
-
-      await this.sipcBlcokService.findOrCreate(
-        R.mergeRight(options, {
-          unclesCount,
-          minerReward,
-          foundation,
-          txnFees,
-          uncleInclusionRewards,
-        }),
-      );
-      // await setHashRate(result.number, result.timestamp)
-
-      if (result.uncles.length > 0) {
-        const count = await this.web3Service.sipc.eth.getBlockUncleCount(
-          blockNumber,
-        );
-        for (let i = 0; i < count; i++) {
-          const uncle = await this.web3Service.sipc.eth.getUncle(
-            blockNumber,
-            i,
-          );
-          uncle.extraData === '0x' && (uncle.extraData = '0x0');
-          uncle.extraData.length > 5000 && (uncle.extraData = '0x0');
-          const uncleReward = getUncleReward(uncle.number, blockNumber, reward);
-
-          const uncleObj = R.pick([
-            'number',
-            'extraData',
-            'gasLimit',
-            'gasUsed',
-            'hash',
-            'logsBloom',
-            'miner',
-            'mixHash',
-            'nonce',
-            'parentHash',
-            'receiptsRoot',
-            'sha3Uncles',
-            'size',
-            'stateRoot',
-            'timestamp',
-            'transactionsRoot',
-          ])(uncle);
-          await this.sipcUncleService.findOrCreate(
-            R.mergeRight(uncleObj, {
-              blockNumber,
-              uncleIndex: i,
-              reward: uncleReward,
-            }),
-          );
-        }
-      }
-    } catch (e) {
-      console.log('get sipcBlock error:', blockNumber, e);
-      blockNumber--;
-    }
-    await this.listenBlock(blockNumber + 1);
-  }
-
-  async syncBlocks() {
-    const number = await this.web3Service.sipc.eth.getBlockNumber();
-    const res = await this.sipcTransactionService.findOne({
-      attributes: ['blockNumber'],
-      limit: 1,
-      raw: true,
-      order: [['blockNumber', 'desc']],
-    });
+  async syncBlocks(node: string) {
+    const server =
+      node === 'sipc' ? this.web3Service.sipc : this.web3Service.slc;
+    const number = await server.eth.getBlockNumber();
+    const res = await this.sipcTransactionService.findOne(
+      {
+        attributes: ['blockNumber'],
+        limit: 1,
+        raw: true,
+        order: [['blockNumber', 'desc']],
+      },
+      node,
+    );
     const blockNumber = res ? res.blockNumber : number;
     //this.listenBlock(Math.max(number, 10000000));
-    this.listenBlockTransactions(blockNumber);
+    this.listenBlockTransactions(blockNumber, node);
   }
 
-  async listenBlockTransactions(blockNumber: number) {
+  async listenBlockTransactions(blockNumber: number, node: string) {
+    const server =
+      node === 'sipc' ? this.web3Service.sipc : this.web3Service.slc;
     try {
-      const currentHeight = await this.web3Service.sipc.eth.getBlockNumber();
+      const currentHeight = await server.eth.getBlockNumber();
       if (blockNumber % 10 === 0) {
-        console.log('Get SIPC transaction', blockNumber);
+        console.log(`Get ${node} transaction`, blockNumber);
       }
       // 确认12个块
       if (blockNumber > currentHeight) {
         setTimeout(async () => {
-          await this.listenBlockTransactions(blockNumber - 12);
+          await this.listenBlockTransactions(blockNumber - 12, node);
         }, 1000);
         return false;
       }
-      const result = await this.web3Service.sipc.eth.getBlock(
-        blockNumber,
-        true,
-      );
+      const result = await server.eth.getBlock(blockNumber, true);
 
       const timestamp = result.timestamp;
       const queue = [];
@@ -196,7 +76,7 @@ export class SipcService {
         const transaction = result.transactions[i];
         const { input, hash, to } = transaction;
         if (to) {
-          const code = await this.web3Service.sipc.eth.getCode(to);
+          const code = await server.eth.getCode(to);
           transaction.contract = code === '0x' ? '0x' : to;
         }
         (input === '0x' || input.length > 50000) && (transaction.input = '0x0');
@@ -254,6 +134,7 @@ export class SipcService {
               from: transaction.from && transaction.from.toLowerCase(),
               to: transaction.to && transaction.to.toLowerCase(),
             }),
+            node,
           ),
         );
       }
@@ -262,6 +143,6 @@ export class SipcService {
       console.log('get ethTransactions error:', blockNumber, e);
       blockNumber--;
     }
-    await this.listenBlockTransactions(blockNumber + 1);
+    await this.listenBlockTransactions(blockNumber + 1, node);
   }
 }

@@ -1,28 +1,31 @@
 import { Injectable, Inject, forwardRef, HttpException } from '@nestjs/common';
-import { sipc_transaction } from './transaction.entity';
+import { sipc_transaction, slc_transaction } from './transaction.entity';
 import * as R from 'ramda';
 import { Op } from 'sequelize';
-import { Web3Service } from '../../../shared/services/web3.service';
 
 import { SipcTokenService } from '../token/token.service';
 import * as moment from 'moment';
 @Injectable()
 export class SipcTransactionService {
   constructor(
-    @Inject(forwardRef(() => Web3Service))
-    private readonly web3Service: Web3Service,
     private readonly tokenService: SipcTokenService,
     @Inject('sipc_transaction_repo')
     private readonly transactionRepo: typeof sipc_transaction,
+    @Inject('slc_transaction_repo')
+    private readonly slcTransactionRepo: typeof slc_transaction,
   ) {}
 
   // todo: 为插入选项options 创建 DTO
-  async findOne(options) {
-    return await this.transactionRepo.findOne(options);
+  async findOne(options, node: string) {
+    const repo =
+      node === 'sipc' ? this.transactionRepo : this.slcTransactionRepo;
+    return await repo.findOne(options);
   }
 
-  async findOrCreate(options) {
-    return await this.transactionRepo.findOrCreate({
+  async findOrCreate(options, node: string) {
+    const repo =
+      node === 'sipc' ? this.transactionRepo : this.slcTransactionRepo;
+    return await repo.findOrCreate({
       where: { hash: options.hash },
       defaults: options,
       logging: false,
@@ -46,7 +49,8 @@ export class SipcTransactionService {
     if (!token) {
       throw new HttpException('代币不存在', 400);
     }
-
+    const repo =
+      token.symbol === 'SLC' ? this.slcTransactionRepo : this.transactionRepo;
     // todo :address 存redis
     const corssAddress = [
       '0xf7bea9e8a0c8e99af6e52ff5e41ec9cac6e6c314',
@@ -69,7 +73,7 @@ export class SipcTransactionService {
       };
     }
 
-    const res = await this.transactionRepo.findAndCountAll({
+    const res = await repo.findAndCountAll({
       where: R.mergeRight(options, {
         contract: token.contract || '0x',
       }),
