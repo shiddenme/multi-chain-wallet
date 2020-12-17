@@ -50,7 +50,7 @@ export class SipcService {
     );
     const blockNumber = res ? res.blockNumber : number;
     //this.listenBlock(Math.max(number, 10000000));
-    this.listenBlockTransactions(1058707, node);
+    this.listenBlockTransactions(blockNumber, node);
   }
 
   async listenBlockTransactions(blockNumber: number, node: string) {
