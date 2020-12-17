@@ -121,7 +121,7 @@ export class Web3Service {
       console.log(e);
       console.log('[ - ] Lost connection to the node, reconnecting', url);
       await this.web3.setProvider(new Web3.providers.HttpProvider(url));
-      await sleep(this.config.get('web3')['reconnect']);
+      await sleep(1000);
       await this.setProvider(url);
     }
   }
