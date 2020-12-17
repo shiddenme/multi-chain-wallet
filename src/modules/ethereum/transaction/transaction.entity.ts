@@ -22,7 +22,7 @@ export class eth_transaction extends Model<eth_transaction> {
   })
   public hash: BinaryType;
 
-  @Index('from_to_contract_timestamp')
+  @Index('from_to_contract')
   @Column({
     type: 'varchar(64)',
   })
@@ -43,7 +43,7 @@ export class eth_transaction extends Model<eth_transaction> {
   @Column({ type: DataType.BIGINT })
   public nonce: number;
 
-  @Index('from_to_contract_timestamp')
+  @Index('from_to_contract')
   @Column({ type: 'varchar(64)' })
   public to: string;
 
@@ -53,11 +53,10 @@ export class eth_transaction extends Model<eth_transaction> {
   @Column({ type: 'varbinary(32)' })
   public value: BinaryType;
 
-  @Index('from_to_contract_timestamp')
+  @Index('from_to_contract')
   @Column({ type: 'varchar(64)' })
   public contract: string;
 
-  @Index('from_to_contract_timestamp')
   @Column({ type: DataType.BIGINT })
   public timestamp: number;
 
