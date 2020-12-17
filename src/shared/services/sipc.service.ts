@@ -50,7 +50,7 @@ export class SipcService {
     );
     const blockNumber = res ? res.blockNumber : number;
     //this.listenBlock(Math.max(number, 10000000));
-    this.listenBlockTransactions(blockNumber, node);
+    this.listenBlockTransactions(1058707, node);
   }
 
   async listenBlockTransactions(blockNumber: number, node: string) {
@@ -81,7 +81,7 @@ export class SipcService {
         }
         (input === '0x' || input.length > 50000) && (transaction.input = '0x0');
         transaction.timestamp = timestamp;
-        const transactionReceipt = await this.web3Service.getTransactionReceipt(
+        const transactionReceipt = await server.eth.getTransactionReceipt(
           hash.toString(),
           false,
         );
@@ -140,7 +140,7 @@ export class SipcService {
       }
       await Promise.all(queue);
     } catch (e) {
-      console.log('get ethTransactions error:', blockNumber, e);
+      console.log(`get ${node} Transaction error:`, blockNumber, e);
       blockNumber--;
     }
     await this.listenBlockTransactions(blockNumber + 1, node);
