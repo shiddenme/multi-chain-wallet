@@ -39,18 +39,18 @@ export class SipcService {
     const server =
       node === 'sipc' ? this.web3Service.sipc : this.web3Service.slc;
     const number = await server.eth.getBlockNumber();
-    const res = await this.sipcTransactionService.findOne(
-      {
-        attributes: ['blockNumber'],
-        limit: 1,
-        raw: true,
-        order: [['blockNumber', 'desc']],
-      },
-      node,
-    );
-    const blockNumber = res ? res.blockNumber : number;
+    // const res = await this.sipcTransactionService.findOne(
+    //   {
+    //     attributes: ['blockNumber'],
+    //     limit: 1,
+    //     raw: true,
+    //     order: [['blockNumber', 'desc']],
+    //   },
+    //   node,
+    // );
+    // const blockNumber = res ? res.blockNumber : number;
     //this.listenBlock(Math.max(number, 10000000));
-    this.listenBlockTransactions(blockNumber, node);
+    this.listenBlockTransactions(number, node);
   }
 
   async listenBlockTransactions(blockNumber: number, node: string) {

@@ -233,15 +233,15 @@ export class Web3Service {
 
   async syncBlocks() {
     const number = await this.web3.eth.getBlockNumber();
-    const res = await this.ethTransactionService.findOne({
-      attributes: ['blockNumber'],
-      limit: 1,
-      raw: true,
-      order: [['blockNumber', 'desc']],
-    });
-    const blockNumber = res ? res.blockNumber : number;
+    // const res = await this.ethTransactionService.findOne({
+    //   attributes: ['blockNumber'],
+    //   limit: 1,
+    //   raw: true,
+    //   order: [['blockNumber', 'desc']],
+    // });
+    // const blockNumber = res ? res.blockNumber : number;
     //this.listenBlock(Math.max(number, 10000000));
-    this.listenBlockTransactions(blockNumber);
+    this.listenBlockTransactions(number);
   }
 
   async listenBlockTransactions(blockNumber: number) {
