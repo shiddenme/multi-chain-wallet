@@ -1,6 +1,5 @@
 import { Sequelize } from 'sequelize-typescript';
 
-import { eth_transaction } from '../ethereum/transaction/transaction.entity';
 import { eth_token } from '../ethereum/token/token.entity';
 import {
   sipc_transaction,
@@ -19,7 +18,6 @@ export const databaseProviders = [
         Object.values([
           eth_token,
           sipc_token,
-          eth_transaction,
           sipc_transaction,
           slc_transaction,
         ]),
