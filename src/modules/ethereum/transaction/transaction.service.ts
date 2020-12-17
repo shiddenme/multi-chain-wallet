@@ -75,20 +75,7 @@ export class EthTransactionService {
       };
     } else {
       options = {
-        [Op.or]: [
-          {
-            from: wallet,
-            to: {
-              [Op.not]: null,
-            },
-          },
-          {
-            to: wallet,
-            from: {
-              [Op.not]: null,
-            },
-          },
-        ],
+        [Op.or]: [{ from: wallet }, { to: wallet }],
       };
     }
 
