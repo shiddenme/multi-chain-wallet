@@ -28,7 +28,7 @@ class parseDto {
 @Injectable()
 export class Web3Service {
   private readonly web3 = new Web3(
-    new Web3.providers.HttpProvider(this.config.get('web3')['gethServer']),
+    new Web3.providers.HttpProvider('http://127.0.0.1:8545'),
   );
   public readonly sipc = new Web3(
     new Web3.providers.HttpProvider(this.config.get('web3')['sipcServer']),
@@ -114,7 +114,7 @@ export class Web3Service {
   }
 
   async setProvider(url?: string) {
-    url || (url = this.config.get('web3')['gethServer']);
+    url || (url = 'http://127.0.0.1:8545');
     try {
       await this.web3.eth.net.isListening();
     } catch (e) {
@@ -247,7 +247,6 @@ export class Web3Service {
   }
 
   async listenBlockTransactions(blockNumber: number) {
-    const m = new Date().valueOf();
     try {
       const currentHeight = await this.web3.eth.getBlockNumber();
 
@@ -264,8 +263,6 @@ export class Web3Service {
 
       const timestamp = result.timestamp;
       const queue = [];
-      const n = new Date().valueOf();
-      this.logger.debug(n - m);
       for (let i = 0; i < result.transactions.length; i++) {
         const transaction = result.transactions[i];
         const { input, hash, to } = transaction;
@@ -349,12 +346,7 @@ export class Web3Service {
           ),
         );
       }
-      const t1 = new Date().valueOf();
-      this.logger.debug(t1 - m);
       await Promise.all(queue);
-      const t = new Date().valueOf();
-      this.logger.debug(t - m);
-      this.logger.debug(result.transactions.length);
     } catch (e) {
       console.log('get ethTransactions error:', blockNumber, e);
       blockNumber--;
