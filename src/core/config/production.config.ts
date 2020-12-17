@@ -9,7 +9,7 @@ export default {
   },
   web3: {
     gethServer: 'http://8.210.111.37:8545',
-    reconnect: 5000,
+    reconnect: 2000,
     sipcServer: 'https://explorer.simplechain.com/rpc',
     slcServer: 'http://101.68.74.171:8555',
     transferEvent:

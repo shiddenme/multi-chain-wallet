@@ -70,6 +70,10 @@ export class SipcTokenService {
       res.map(async (token) => {
         const { contract, symbol } = token;
         const node = symbol === 'SLC' ? 'slc' : 'sipc';
+        const server =
+          symbol === 'SLC'
+            ? this.config.get('web3')['slcServer']
+            : this.config.get('web3')['sipcServer'];
         const balance = await this.web3Service.myBalanceOf(
           contract,
           wallet,
@@ -78,11 +82,12 @@ export class SipcTokenService {
 
         const gasPrice = await this.web3Service.getGasPrice(node);
         const decimals = await this.web3Service.getDecimals(contract, false);
+
         return R.mergeRight(token, {
           balance,
           gasPrice,
           decimals,
-          server: this.config.get('web3')['sipcServer'],
+          server,
         });
       }),
     );
