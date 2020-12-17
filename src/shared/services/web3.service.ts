@@ -1,10 +1,11 @@
-import { Injectable, HttpException } from '@nestjs/common';
+import { Injectable, HttpException, Logger } from '@nestjs/common';
 import { ConfigService } from '../../core';
 
 import {
   EthBlockService,
   EthUncleService,
   EthTransactionService,
+  EthTokenService,
 } from '../../modules';
 
 import {
@@ -35,13 +36,14 @@ export class Web3Service {
   public readonly slc = new Web3(
     new Web3.providers.HttpProvider(this.config.get('web3')['slcServer']),
   );
-
+  private readonly logger = new Logger(Web3Service.name);
   public readonly web3Contract = new this.web3.eth.Contract(erc20AbI);
   public readonly sipcContract = new this.sipc.eth.Contract(erc20AbI);
 
   constructor(
     private readonly ethBlcokService: EthBlockService,
     private readonly ethUncleService: EthUncleService,
+    private readonly ethTokenService: EthTokenService,
     private readonly ethTransactionService: EthTransactionService,
     private readonly config: ConfigService,
   ) {}
@@ -245,10 +247,11 @@ export class Web3Service {
   }
 
   async listenBlockTransactions(blockNumber: number) {
+    const m = new Date().valueOf();
     try {
       const currentHeight = await this.web3.eth.getBlockNumber();
 
-      console.log('Get ETHEREUM transaction', blockNumber);
+      console.log('Get eth transaction', blockNumber);
 
       // 确认12个块
       if (blockNumber > currentHeight) {
@@ -261,13 +264,26 @@ export class Web3Service {
 
       const timestamp = result.timestamp;
       const queue = [];
+      const n = new Date().valueOf();
+      this.logger.debug(n - m);
       for (let i = 0; i < result.transactions.length; i++) {
         const transaction = result.transactions[i];
         const { input, hash, to } = transaction;
-        if (to) {
-          const code = await this.web3.eth.getCode(to);
-          transaction.contract = code === '0x' ? '0x' : to;
+        // 跳过创建合约的交易
+        if (!to) {
+          continue;
         }
+        const code = await this.web3.eth.getCode(to);
+        transaction.contract = code === '0x' ? '0x' : to;
+        const token = await this.ethTokenService.findOne({
+          contract: transaction.contract,
+        });
+        // 跳过表中不存在的合约币交易
+        if (!token) {
+          continue;
+        }
+        const tableName = `eth_transaction_${token.sort}`;
+
         (input === '0x' || input.length > 50000) && (transaction.input = '0x0');
         transaction.timestamp = timestamp;
         const transactionReceipt = await this.getTransactionReceipt(
@@ -329,10 +345,16 @@ export class Web3Service {
               from: transaction.from && transaction.from.toLowerCase(),
               to: transaction.to && transaction.to.toLowerCase(),
             }),
+            tableName,
           ),
         );
       }
+      const t1 = new Date().valueOf();
+      this.logger.debug(t1 - m);
       await Promise.all(queue);
+      const t = new Date().valueOf();
+      this.logger.debug(t - m);
+      this.logger.debug(result.transactions.length);
     } catch (e) {
       console.log('get ethTransactions error:', blockNumber, e);
       blockNumber--;

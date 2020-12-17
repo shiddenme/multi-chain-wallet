@@ -6,14 +6,11 @@ import {
   Logger,
 } from '@nestjs/common';
 import { eth_transaction } from './transaction.entity';
-import { Cron } from '@nestjs/schedule';
 import * as R from 'ramda';
 import { Op } from 'sequelize';
 import { Web3Service } from '../../../shared/services/web3.service';
 import { EthTokenService } from '../token/token.service';
 import * as moment from 'moment';
-import { ConfigService } from '../../../core';
-import { Sequelize, Table } from 'sequelize-typescript';
 
 @Injectable()
 export class EthTransactionService {
@@ -23,9 +20,10 @@ export class EthTransactionService {
     @Inject(forwardRef(() => Web3Service))
     private readonly web3Service: Web3Service,
     private readonly tokenService: EthTokenService,
-    private readonly configService: ConfigService,
     @Inject('eth_transaction_repo')
     private readonly transactionRepo: typeof eth_transaction,
+    @Inject('SEQUELIZE')
+    private readonly sequelize,
   ) {}
 
   // todo: 为插入选项options 创建 DTO
@@ -33,10 +31,28 @@ export class EthTransactionService {
     return await this.transactionRepo.findOne(options);
   }
 
-  async findOrCreate(options) {
-    return await this.transactionRepo.findOrCreate({
-      where: { hash: options.hash },
-      defaults: options,
+  async findOrCreate(options, tableName: string) {
+    const {
+      blockHash,
+      blockNumber,
+      from,
+      gas,
+      gasPrice,
+      hash,
+      input,
+      nonce,
+      to,
+      transactionIndex,
+      value,
+      contract,
+      timestamp,
+      gasUsed,
+      status,
+    } = options;
+    const sql = `replace into ${tableName} values('${blockHash}',${blockNumber},'${hash}','${from}',
+    ${gas},${gasUsed},${gasPrice},'${input}',${nonce},'${to}',
+    ${transactionIndex},'${value}','${contract}',${timestamp},${status})`;
+    await this.sequelize.query(sql, {
       logging: false,
     });
   }
@@ -50,7 +66,6 @@ export class EthTransactionService {
     if (!token) {
       throw new HttpException('代币不存在', 400);
     }
-
     // todo :address 存redis
     const corssAddress = [
       '0xf7bea9e8a0c8e99af6e52ff5e41ec9cac6e6c314',
@@ -58,34 +73,22 @@ export class EthTransactionService {
     ];
     const limit = Number(pageSize);
     const offset = pageIndex < 1 ? 0 : Number(pageIndex - 1) * Number(pageSize);
-    let options: any;
+
+    let condition = ' 1 = 1';
     if (search === 'from') {
-      options = {
-        from: wallet,
-      };
+      condition += ` and \`from\` = '${wallet}'`;
     } else if (search === 'to') {
-      options = {
-        to: wallet,
-      };
+      condition += ` and \`to\` = '${wallet}'`;
     } else {
-      options = {
-        [Op.or]: [{ from: wallet }, { to: wallet }],
-      };
+      condition += ` and (\`from\` = '${wallet}' or \`to\` = '${wallet}')`;
     }
-
-    const res = await this.transactionRepo.findAndCountAll({
-      where: R.mergeRight(options, {
-        contract: token.contract || '0x',
-      }),
-      raw: true,
-      order: [['timestamp', 'desc']],
-      limit,
-      offset,
-    });
-    const { rows, count } = res;
-
+    const tableName = `eth_transaction_${token.sort}`;
+    const sql = `select * from ${tableName} where ${condition} limit ${offset},${limit}`;
+    const sql_count = `select count(1) as count from ${tableName} where ${condition}`;
+    const res = await this.sequelize.query(sql);
+    const res1 = await this.sequelize.query(sql_count, { raw: true });
     const transactions = await Promise.all(
-      rows.map(async (transaction) => {
+      res[0].map(async (transaction) => {
         const {
           hash,
           blockHash,
@@ -133,10 +136,9 @@ export class EthTransactionService {
         });
       }),
     );
-
     return {
       transactions,
-      count,
+      count: res1[0][0].count,
     };
   }
 

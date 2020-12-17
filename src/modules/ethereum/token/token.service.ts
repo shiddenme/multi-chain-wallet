@@ -49,6 +49,7 @@ export class EthTokenService {
     return await this.tokenRepo.findOne({
       where: R.pick(['contract', 'symbol', 'name'])(where),
       raw: true,
+      logging: false,
     });
   }
 

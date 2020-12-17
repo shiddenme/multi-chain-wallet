@@ -25,10 +25,10 @@ import { EthTransactionModule } from './modules/ethereum/transaction/transaction
     EthTransactionModule,
   ],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(transactionMiddleware)
-      .forRoutes({ path: 'eth/transaction', method: RequestMethod.GET });
-  }
+export class AppModule {
+  // configure(consumer: MiddlewareConsumer) {
+  //   consumer
+  //     .apply(transactionMiddleware)
+  //     .forRoutes({ path: 'eth/transaction', method: RequestMethod.GET });
+  // }
 }
