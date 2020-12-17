@@ -58,15 +58,9 @@ export class SipcTransactionService {
     if (search === 'from') {
       options = {
         from: wallet,
-        to: {
-          [Op.not]: null,
-        },
       };
     } else if (search === 'to') {
       options = {
-        from: {
-          [Op.not]: null,
-        },
         to: wallet,
       };
     } else {
