@@ -287,6 +287,9 @@ export class Web3Service {
           hash.toString(),
           true,
         );
+        if (!transactionReceipt) {
+          continue;
+        }
         const { gasUsed, logs, status } = transactionReceipt;
         transaction.gasUsed = gasUsed;
         transaction.status = status;
