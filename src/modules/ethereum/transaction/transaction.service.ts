@@ -83,7 +83,7 @@ export class EthTransactionService {
       condition += ` and (\`from\` = '${wallet}' or \`to\` = '${wallet}')`;
     }
     const tableName = `eth_transaction_${token.sort}`;
-    const sql = `select * from ${tableName} where ${condition} limit ${offset},${limit}`;
+    const sql = `select * from ${tableName} where ${condition} order by timestamp limit ${offset},${limit}`;
     const sql_count = `select count(1) as count from ${tableName} where ${condition}`;
     const res = await this.sequelize.query(sql);
     const res1 = await this.sequelize.query(sql_count, { raw: true });

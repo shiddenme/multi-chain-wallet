@@ -22,7 +22,7 @@ export class sipc_transaction extends Model<sipc_transaction> {
   })
   public hash: BinaryType;
 
-  @Index('from_contract')
+  @Index('from_contract_timestamp')
   @Column({
     type: 'varchar(64)',
   })
@@ -43,7 +43,7 @@ export class sipc_transaction extends Model<sipc_transaction> {
   @Column({ type: DataType.BIGINT })
   public nonce: number;
 
-  @Index('to_contract')
+  @Index('to_contract_timestamp')
   @Column({ type: 'varchar(64)' })
   public to: string;
 
@@ -53,11 +53,13 @@ export class sipc_transaction extends Model<sipc_transaction> {
   @Column({ type: 'varbinary(32)' })
   public value: BinaryType;
 
-  @Index('from_contract')
-  @Index('to_contract')
+  @Index('from_contract_timestamp')
+  @Index('to_contract_timestamp')
   @Column({ type: 'varchar(64)' })
   public contract: string;
 
+  @Index('from_contract_timestamp')
+  @Index('to_contract_timestamp')
   @Column({ type: DataType.BIGINT })
   public timestamp: number;
 

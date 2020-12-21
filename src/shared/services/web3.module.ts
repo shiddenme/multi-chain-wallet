@@ -6,10 +6,6 @@ import {
   EthTransactionModule,
   EthUncleModule,
   EthTokenModule,
-  SipcBlockModule,
-  SipcTransactionModule,
-  SipcUncleModule,
-  SipcTokenModule,
 } from '../../modules';
 
 @Global()
@@ -19,10 +15,6 @@ import {
     EthTransactionModule,
     EthUncleModule,
     EthTokenModule,
-    SipcBlockModule,
-    SipcTransactionModule,
-    SipcUncleModule,
-    SipcTokenModule,
     ConfigModule,
   ],
   providers: [Web3Service],
