@@ -25,10 +25,10 @@ import { Web3Module } from './web3.module';
 export class SipcModule {
   constructor(sipc: SipcService) {
     setTimeout(() => {
-      sipc.setProvider('sipc');
-      sipc.syncBlocks('sipc');
-      sipc.setProvider('slc');
-      sipc.syncBlocks('slc');
+      // sipc.setProvider('sipc');
+      // sipc.syncBlocks('sipc');
+      // sipc.setProvider('slc');
+      // sipc.syncBlocks('slc');
     }, 2000);
   }
 }

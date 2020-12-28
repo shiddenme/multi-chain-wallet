@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 
 import { CoreModule } from './core';
 import { SipcModule } from './shared';
+import { BitcoinModule } from './modules';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { ScheduleModule } from '@nestjs/schedule';
-import { EthTransactionModule } from './modules/ethereum/transaction/transaction.module';
 
 @Module({
   imports: [
@@ -16,7 +16,7 @@ import { EthTransactionModule } from './modules/ethereum/transaction/transaction
     }),
     CoreModule,
     SipcModule,
-    EthTransactionModule,
+    BitcoinModule,
   ],
 })
 export class AppModule {}
