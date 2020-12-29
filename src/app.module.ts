@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 
 import { CoreModule } from './core';
 import { SipcModule } from './shared';
-import { BitcoinModule } from './modules';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { ScheduleModule } from '@nestjs/schedule';
@@ -16,7 +15,6 @@ import { ScheduleModule } from '@nestjs/schedule';
     }),
     CoreModule,
     SipcModule,
-    BitcoinModule,
   ],
 })
 export class AppModule {}

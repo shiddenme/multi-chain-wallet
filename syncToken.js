@@ -32,8 +32,8 @@ async function spider() {
             \`status\` tinyint(1) DEFAULT NULL,
             PRIMARY KEY (\`hash\`),
             KEY \`blockNumber\` (\`blockNumber\`),
-            KEY \`from\` (\`from\`),
-            KEY \`to\` (\`to\`)
+            KEY from_timestamp (\`from\`,\`timestamp\`),
+            KEY to_timestamp (\`to\`,\`timestamp\`)
           ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`;
         await promisePool.query(sql)
     }))
