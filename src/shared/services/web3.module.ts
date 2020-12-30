@@ -9,7 +9,7 @@ import {
 
 @Global()
 @Module({
-  imports: [EthBlockModule, EthTransactionModule, EthTokenModule, ConfigModule],
+  imports: [EthBlockModule, EthTokenModule, EthTransactionModule, ConfigModule],
   providers: [Web3Service],
   exports: [Web3Service],
 })
