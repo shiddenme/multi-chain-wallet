@@ -12,3 +12,6 @@ export function fromWei(wei: string | null, unit: string) {
 }
 
 export function distributeTable(from: string, to: string) {}
+export function asAddress(values: string): string {
+  return values.replace(/[^a-z0-9]/gi, '');
+}

@@ -8,11 +8,20 @@ export default {
     dialect: 'mysql',
   },
   web3: {
-    gethServer: 'http://8.210.111.37:8545',
+    gethServer: 'http://127.0.0.1:8545',
     reconnect: 2000,
     sipcServer: 'https://explorer.simplechain.com/rpc',
     slcServer: 'http://101.68.74.171:8555',
     transferEvent:
       '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
+  },
+  bitcoin: {
+    server: 'http://192.168.4.148:8332',
+    header: {
+      Authorization: 'Basic ' + 'dXNlcjoxMjM0NTY=',
+      Connection: 'keep-alive',
+      'Content-Type': 'application/json',
+    },
+    addressApi: 'blockchain.com',
   },
 };

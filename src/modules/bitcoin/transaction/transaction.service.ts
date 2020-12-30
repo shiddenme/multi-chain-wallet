@@ -1,5 +1,5 @@
 import { Injectable, Inject, forwardRef, HttpException } from '@nestjs/common';
-//import { asAddress } from '../../../shared/utils/tools';
+import { asAddress } from '../../../shared/utils/tools';
 import { BitcoinService } from '../bitcoin.service';
 @Injectable()
 export class BtcTransactionService {
@@ -8,7 +8,7 @@ export class BtcTransactionService {
     const { wallet, pageIndex = 1, pageSize = 10 } = query;
     const offset = parseInt(pageIndex);
     const limit = parseInt(pageSize);
-    const address = wallet;
+    const address = asAddress(wallet);
     const validateaddressResult = await this.btcService.sendRequest(
       'validateaddress',
       [address],
