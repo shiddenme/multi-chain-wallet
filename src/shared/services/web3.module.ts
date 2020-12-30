@@ -23,8 +23,8 @@ import {
 export class Web3Module {
   constructor(web3: Web3Service) {
     setTimeout(() => {
-      web3.setProvider();
-      web3.syncBlocks();
+      // web3.setProvider();
+      // web3.syncBlocks();
     }, 2000);
   }
 }

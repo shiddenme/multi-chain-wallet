@@ -8,7 +8,7 @@ export default {
     dialect: 'mysql',
   },
   web3: {
-    gethServer: 'http://8.210.111.37:8545',
+    gethServer: 'http://192.168.4.147:8545',
     reconnect: 2000,
     sipcServer: 'https://explorer.simplechain.com/rpc',
     slcServer: 'http://101.68.74.171:8555',
@@ -22,5 +22,6 @@ export default {
       Connection: 'keep-alive',
       'Content-Type': 'application/json',
     },
+    addressApi: 'blockchain.com',
   },
 };
