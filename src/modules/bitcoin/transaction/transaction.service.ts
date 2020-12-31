@@ -33,7 +33,7 @@ export class BtcTransactionService {
       offset,
       limit,
     );
-    const { txids, txCount } = addressDetailsResult.addressDetails;
+    const { txids, txCount, balanceSat } = addressDetailsResult.addressDetails;
     const rawTxResult = await this.btcService.getRawTransactionsWithInputs(
       txids,
       address,
@@ -58,6 +58,7 @@ export class BtcTransactionService {
     });
     return {
       txs,
+      balance: balanceSat * Math.pow(10, -8),
       count: txCount,
     };
   }
