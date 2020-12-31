@@ -3,6 +3,13 @@ import { asAddress } from '../../../shared/utils/tools';
 import { BitcoinService } from '../bitcoin.service';
 import * as R from 'ramda';
 import * as moment from 'moment';
+type vin = {
+  txid: string;
+  vout: number;
+  scriptSig?: any;
+  txinwitness?: any[];
+  sequence?: number;
+};
 @Injectable()
 export class BtcTransactionService {
   constructor(private readonly btcService: BitcoinService) {}
@@ -43,7 +50,7 @@ export class BtcTransactionService {
         .utcOffset(480)
         .format('YYYY-MM-DD HH:mm:ss');
       return {
-        hash,
+        txid,
         value: Math.abs(value).toString(),
         date,
         mark,
@@ -53,5 +60,42 @@ export class BtcTransactionService {
       txs,
       count: txCount,
     };
+  }
+
+  async getTransactionDetail(txid: string) {
+    const rawTx = await this.btcService.sendRequest('getrawtransaction', [
+      txid,
+      1,
+    ]);
+    let inputs = [];
+    const { vin: vins, vout: outputs, time, blockhash } = rawTx;
+    if (vins) {
+      inputs = await Promise.all(
+        R.map(async (ele: vin) => {
+          return await this.btcService.getSummarizedTransactionOutput(
+            ele.txid,
+            ele.vout,
+          );
+        })(vins),
+      );
+    }
+    const txnFee =
+      R.reduce(R.add, 0)(R.map(R.prop('value'))(inputs)) -
+      R.reduce(R.add, 0)(R.map(R.prop('value'))(outputs));
+    const date = moment(time * 1000)
+      .utcOffset(480)
+      .format('YYYY-MM-DD HH:mm:ss');
+    const getAddress = (input) => {
+      if (!input.scriptPubKey || !input.scriptPubKey.addresses) return '';
+      return input.scriptPubKey.addresses[0];
+    };
+    const block = await this.btcService.sendRequest('getblock', [blockhash]);
+    return R.mergeRight(R.omit(['vin', 'vout', 'hex'])(rawTx), {
+      txnFee,
+      date,
+      blockNumber: block.height,
+      inputs: R.map(R.prop('address'))(inputs),
+      outputs: R.map(getAddress)(outputs),
+    });
   }
 }

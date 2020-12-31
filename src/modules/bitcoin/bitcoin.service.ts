@@ -19,25 +19,26 @@ export class BitcoinService {
   ) {}
 
   async sendRequest(method: string, params: any[]) {
-    const res = await this.httpService
-      .post(
-        this.config.get('bitcoin')[global.activeBlockchain],
-        {
-          jsonrpc: '1.0',
-          id: 'call',
-          method,
-          params,
-        },
-        {
-          headers: this.config.get('bitcoin')['header'],
-        },
-      )
-      .toPromise();
-    if (!res.data || res.data.error) {
-      this.logger.error(res.data.error);
-      throw new HttpException(res.data.error, 500);
+    try {
+      const res = await this.httpService
+        .post(
+          this.config.get('bitcoin')[global.activeBlockchain],
+          {
+            jsonrpc: '1.0',
+            id: 'call',
+            method,
+            params,
+          },
+          {
+            headers: this.config.get('bitcoin')['header'],
+          },
+        )
+        .toPromise();
+      return res.data.result;
+    } catch (e) {
+      console.log(e);
+      throw new HttpException('节点请求错误', 500);
     }
-    return res.data.result;
   }
 
   async getAddressDetails(address, scriptPubkey, sort, offset, limit) {

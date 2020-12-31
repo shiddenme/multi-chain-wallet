@@ -1,4 +1,11 @@
-import { Controller, UseFilters, Get, Query, Logger } from '@nestjs/common';
+import {
+  Controller,
+  UseFilters,
+  Get,
+  Query,
+  Logger,
+  Param,
+} from '@nestjs/common';
 
 import { BtcTransactionService } from './transaction.service';
 import { HttpExceptionFilter } from '../../../core';
@@ -10,7 +17,10 @@ class findTransactionDto {
   pageIndex: string;
   pageSize: string;
 }
-
+class paramDto {
+  @IsNotEmpty({ message: 'id不能为空' })
+  txid: string;
+}
 @Controller('btc')
 export class BtcTransactionController {
   private readonly logger = new Logger(BtcTransactionController.name);
@@ -31,5 +41,12 @@ export class BtcTransactionController {
     return {
       currentNetwork: global.activeBlockchain,
     };
+  }
+
+  @Get('/transaction/:txid')
+  @UseFilters(new HttpExceptionFilter())
+  async getTransactionDetail(@Param() param: paramDto) {
+    const { txid } = param;
+    return this.transactionService.getTransactionDetail(txid);
   }
 }
