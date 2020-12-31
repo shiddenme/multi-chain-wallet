@@ -16,7 +16,8 @@ export default {
       '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
   },
   bitcoin: {
-    server: 'http://192.168.4.148:8332',
+    main: 'http://192.168.4.148:8332',
+    test: 'http://127.0.0.1:8332',
     header: {
       Authorization: 'Basic ' + 'dXNlcjoxMjM0NTY=',
       Connection: 'keep-alive',

@@ -15,7 +15,6 @@ import {
 })
 export class Web3Module {
   constructor(web3: Web3Service) {
-    console.log('============sss=========');
     setTimeout(() => {
       // web3.setProvider();
       // web3.syncBlocks();

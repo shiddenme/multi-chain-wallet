@@ -7,11 +7,21 @@ import * as http from 'http';
 import * as https from 'https';
 import * as express from 'express';
 import * as fs from 'fs';
+
+declare global {
+  namespace NodeJS {
+    interface Global {
+      activeBlockchain: string;
+    }
+  }
+}
+global.activeBlockchain = 'main';
 async function bootstrap() {
   const httpsOptions = {
     key: fs.readFileSync('./secrets/private-key.pem'),
     cert: fs.readFileSync('./secrets/public-certificate.pem'),
   };
+
   const server = express();
   const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
 
