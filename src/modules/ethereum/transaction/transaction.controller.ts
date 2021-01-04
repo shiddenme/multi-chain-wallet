@@ -32,6 +32,12 @@ export class EthTransactionController {
     return await this.transactionService.findAll(query);
   }
 
+  @Get('eth/cross')
+  @UseFilters(new HttpExceptionFilter())
+  async findCross(@Query() query) {
+    return await this.transactionService.findCross(query);
+  }
+
   @Get('transfer')
   @UseFilters(new HttpExceptionFilter())
   async getTransfer(@Query() query: getTransferDto) {

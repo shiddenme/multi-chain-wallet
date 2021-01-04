@@ -107,12 +107,54 @@ export class BtcTransactionService {
     });
   }
 
-  async createRawTransaction(body) {
-    const { inputs, outputs, locktime } = body;
-    const keys = Object.keys(outputs);
-    console.log(keys);
-    if (keys.length !== 1 || !asAddress(keys[0])) {
+  async checkAddress(address: string) {
+    const validateaddressResult = await this.btcService.sendRequest(
+      'validateaddress',
+      [address],
+    );
+    if (!validateaddressResult.isvalid) {
       throw new HttpException('isvalid address', 400);
+    }
+  }
+  async createRawTransaction(body) {
+    const { wallet, to, value, locktime, transactionFee } = body;
+    const from_address = asAddress(wallet);
+    const to_address = asAddress(to);
+    await this.checkAddress(from_address);
+    await this.checkAddress(to_address);
+    // 生成inputs和outputs
+    const inputs = [];
+    const outputs = {
+      [to_address]: value * Math.pow(10, -8),
+    };
+    // 选择获取utxo的地址
+    const url =
+      global.activeBlockchain === 'test'
+        ? 'https://testnet.blockchain.info/unspent?active='
+        : 'https://blockchain.info/unspent?active=';
+    const unspent_outputs = await this.httpService
+      .get(`${url}${wallet}`)
+      .toPromise();
+    const utxos: any = R.prop('unspent_outputs')(unspent_outputs.data);
+    let sumInput: number = 0;
+    let sumOutput: number = value + transactionFee;
+    while (sumInput < sumOutput) {
+      const utxo = utxos.pop();
+      if (!utxo) {
+        throw new HttpException('余额不足', 400);
+      }
+      const { tx_hash_big_endian: txid, value, tx_output_n: vout } = utxo;
+
+      sumInput += value;
+      inputs.push({
+        txid,
+        vout,
+      });
+    }
+    // 找零
+    const amountToKeep = sumInput - sumOutput;
+    if (amountToKeep !== 0) {
+      outputs[`${wallet}`] = amountToKeep * Math.pow(10, -8);
     }
     const params = [];
     params.push(inputs);

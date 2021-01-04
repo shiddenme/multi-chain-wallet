@@ -1,7 +1,13 @@
-import { Injectable, Inject, forwardRef, HttpException } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  forwardRef,
+  HttpException,
+  HttpService,
+} from '@nestjs/common';
 import { eth_transaction } from './transaction.entity';
 import * as R from 'ramda';
-
+import { ConfigService } from '../../../core';
 import { Web3Service } from '../../../shared/services/web3.service';
 import { EthTokenService } from '../token/token.service';
 import * as moment from 'moment';
@@ -11,6 +17,8 @@ export class EthTransactionService {
   constructor(
     @Inject(forwardRef(() => Web3Service))
     private readonly web3Service: Web3Service,
+    private readonly httpService: HttpService,
+    private readonly config: ConfigService,
     private readonly tokenService: EthTokenService,
     @Inject('eth_transaction_repo')
     private readonly transactionRepo: typeof eth_transaction,
@@ -132,5 +140,25 @@ export class EthTransactionService {
     return {
       transfer,
     };
+  }
+
+  async findCross(query) {
+    const { wallet, pageIndex = 1, pageSize = 10 } = query;
+    const fromCross = await this.httpService
+      .post(
+        this.config.get('web3')['cross'],
+        {
+          jsonrpc: '2.0',
+          method: 'cross_ctxOwnerByPage',
+          params: [wallet, pageSize, pageIndex],
+          id: 67,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      )
+      .toPromise();
   }
 }
