@@ -11,7 +11,7 @@ import { BtcTransactionModule } from './modules/bitcoin/transaction/transaction.
   imports: [
     ScheduleModule.forRoot(),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'client'),
+      rootPath: join(__dirname, '../..', 'client'),
       exclude: ['/api*'],
     }),
     CoreModule,

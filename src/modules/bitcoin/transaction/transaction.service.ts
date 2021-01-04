@@ -78,7 +78,7 @@ export class BtcTransactionService {
       balance: balanceSat * Math.pow(10, -8),
       count: txCount,
       server: this.config.get('bitcoin')[global.activeBlockchain],
-      icon: 'http://192.168.4.147:3000/btc.png',
+      icon: 'http://192.168.4.147:3000/images/btc.jpg',
       price: (price * rate).toFixed(2),
     };
   }
