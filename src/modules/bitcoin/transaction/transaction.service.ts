@@ -39,7 +39,7 @@ export class BtcTransactionService {
       offset,
       limit,
     );
-    const { txids, txCount, balanceSat } = addressDetailsResult.addressDetails;
+    const { txids, txCount } = addressDetailsResult.addressDetails;
     const rawTxResult = await this.btcService.getRawTransactionsWithInputs(
       txids,
       address,
@@ -63,19 +63,10 @@ export class BtcTransactionService {
       };
     });
     // todo：存redis
-    const btc2usd = await this.redis.get('btc2usd');
-    const usd2cny = await this.redis.get('usd2cny');
 
     return {
       txs,
-      balance: balanceSat * Math.pow(10, -8),
       count: txCount,
-      server:
-        global.activeBlockchain === 'test'
-          ? 'http://127.0.0.1:18332'
-          : 'http://192.168.4.148:8332',
-      icon: 'http://192.168.4.147:3000/images/btc.jpg',
-      price: (parseFloat(btc2usd) * parseFloat(usd2cny)).toFixed(2),
     };
   }
 
@@ -135,6 +126,43 @@ export class BtcTransactionService {
     );
     return {
       rawTransaction,
+    };
+  }
+
+  async findAsset(query) {
+    const { wallet } = query;
+    const address = asAddress(wallet);
+    const validateaddressResult = await this.btcService.sendRequest(
+      'validateaddress',
+      [address],
+    );
+    if (!validateaddressResult.isvalid) {
+      throw new HttpException('isvalid address', 400);
+    }
+    const addressDetailsResult = await this.btcService.getAddressDetails(
+      address,
+      'validateaddressResult.scriptPubKey',
+      'asc',
+      1,
+      10,
+    );
+    const { balanceSat } = addressDetailsResult.addressDetails;
+    const btc2usd = await this.redis.get('btc2usd');
+    const usd2cny = await this.redis.get('usd2cny');
+    const tokens = [];
+    tokens.push({
+      symbol: 'BTC',
+      name: 'bitcoin',
+      server:
+        global.activeBlockchain === 'test'
+          ? 'http://127.0.0.1:18332'
+          : 'http://192.168.4.148:8332',
+      icon: 'http://192.168.4.147:3000/images/btc.jpg',
+      price: (parseFloat(btc2usd) * parseFloat(usd2cny)).toFixed(2),
+      balance: balanceSat * Math.pow(10, -8),
+    });
+    return {
+      tokens,
     };
   }
 }

@@ -58,11 +58,6 @@ export class EthTransactionService {
     if (!token) {
       throw new HttpException('代币不存在', 400);
     }
-    // todo :address 存redis
-    const corssAddress = [
-      '0xf7bea9e8a0c8e99af6e52ff5e41ec9cac6e6c314',
-      '0x9363611fb9b9b2d6f731963c2ffa6cecf2ec0886',
-    ];
     const limit = Number(pageSize);
     const offset = pageIndex < 1 ? 0 : Number(pageIndex - 1) * Number(pageSize);
 
@@ -103,8 +98,6 @@ export class EthTransactionService {
         if (to === wallet) {
           title = '收款';
           mark = '+';
-        } else if (corssAddress.includes(to)) {
-          title = '跨链';
         } else {
           title = '支付';
         }

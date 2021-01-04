@@ -37,6 +37,11 @@ class rawTransactionDto {
   outputs: object;
   locktime: number;
 }
+
+class findAssetDto {
+  @IsNotEmpty({ message: '钱包地址为空' })
+  wallet: string;
+}
 @Controller('btc')
 export class BtcTransactionController {
   private readonly logger = new Logger(BtcTransactionController.name);
@@ -70,5 +75,11 @@ export class BtcTransactionController {
   @UseFilters(new HttpExceptionFilter())
   async createRawTransaction(@Body() body: rawTransactionDto) {
     return await this.transactionService.createRawTransaction(body);
+  }
+
+  @Get('/asset')
+  @UseFilters(new HttpExceptionFilter())
+  async findAsset(@Query() query: findAssetDto) {
+    return await this.transactionService.findAsset(query);
   }
 }
