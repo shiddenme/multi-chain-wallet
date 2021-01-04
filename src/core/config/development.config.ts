@@ -17,12 +17,18 @@ export default {
   },
   bitcoin: {
     main: 'http://192.168.4.148:8332',
-    test: 'http://127.0.0.1:18332',
+    test: 'http://192.168.4.147:18332',
     header: {
       Authorization: 'Basic ' + 'dXNlcjoxMjM0NTY=',
       Connection: 'keep-alive',
       'Content-Type': 'application/json',
     },
     addressApi: 'blockchair.com',
+    btc2usd: 'https://api.coindesk.com/v1/bpi/currentprice.json',
+    usd2cny: 'https://api.exchangerate-api.com/v4/latest/USD',
+  },
+  redis: {
+    host: '127.0.0.1',
+    port: 6379,
   },
 };

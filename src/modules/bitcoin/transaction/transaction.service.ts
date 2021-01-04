@@ -3,7 +3,7 @@ import { asAddress } from '../../../shared/utils/tools';
 import { BitcoinService } from '../bitcoin.service';
 import * as R from 'ramda';
 import * as moment from 'moment';
-import { ConfigService } from '../../../core';
+
 type vin = {
   txid: string;
   vout: number;
@@ -15,8 +15,9 @@ type vin = {
 export class BtcTransactionService {
   constructor(
     private readonly btcService: BitcoinService,
-    private readonly config: ConfigService,
     private readonly httpService: HttpService,
+    @Inject('REDIS')
+    private readonly redis,
   ) {}
   async getTransactionByAddress(query) {
     const { wallet, pageIndex = 1, pageSize = 10 } = query;
@@ -61,25 +62,20 @@ export class BtcTransactionService {
         mark,
       };
     });
-    const btc2usd = await this.httpService
-      .get('https://api.coindesk.com/v1/bpi/currentprice.json')
-      .toPromise();
-    const usd2cny = await (
-      await this.httpService
-        .get('https://api.exchangerate-api.com/v4/latest/USD')
-        .toPromise()
-    ).data;
-    const rate = Number(R.prop('CNY')(R.prop('rates')(usd2cny)));
-    const price = Number(
-      R.prop('rate_float')(R.prop('USD')(R.prop('bpi')(btc2usd.data))),
-    );
+    // todo：存redis
+    const btc2usd = await this.redis.get('btc2usd');
+    const usd2cny = await this.redis.get('usd2cny');
+
     return {
       txs,
       balance: balanceSat * Math.pow(10, -8),
       count: txCount,
-      server: this.config.get('bitcoin')[global.activeBlockchain],
+      server:
+        global.activeBlockchain === 'test'
+          ? 'http://127.0.0.1:18332'
+          : 'http://192.168.4.148:8332',
       icon: 'http://192.168.4.147:3000/images/btc.jpg',
-      price: (price * rate).toFixed(2),
+      price: (parseFloat(btc2usd) * parseFloat(usd2cny)).toFixed(2),
     };
   }
 

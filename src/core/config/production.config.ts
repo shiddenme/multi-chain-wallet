@@ -24,5 +24,11 @@ export default {
       'Content-Type': 'application/json',
     },
     addressApi: 'blockchair.com',
+    btc2usd: 'https://api.coindesk.com/v1/bpi/currentprice.json',
+    usd2cny: 'https://api.exchangerate-api.com/v4/latest/USD',
+  },
+  redis: {
+    host: '127.0.0.1',
+    port: 6379,
   },
 };

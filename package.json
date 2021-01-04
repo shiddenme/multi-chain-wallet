@@ -36,6 +36,7 @@
     "bn.js": "^5.1.1",
     "class-transformer": "^0.3.1",
     "class-validator": "^0.12.2",
+    "ioredis": "^4.19.4",
     "joi": "^17.3.0",
     "moment": "^2.29.1",
     "mysql2": "^2.2.5",
