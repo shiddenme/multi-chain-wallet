@@ -98,8 +98,6 @@ function getAddressDetailsSortDesc(address, limit, offset) {
 			} else {
 				var fullError = {error:error, response:response, body:body};
 
-				utils.logError("32907shsghs", fullError);
-
 				reject(fullError);
 			}
 		});

@@ -40,7 +40,7 @@ export class BtcTransactionService {
     );
     const { transactions, txInputsByTransaction } = rawTxResult;
     const txs = transactions.map((transaction) => {
-      const { hash, time, txid } = transaction;
+      const { time, txid } = transaction;
       const { vin, vout } = txInputsByTransaction[txid];
       const value =
         R.reduce(R.add, 0)(R.map(R.prop('value'))(vout)) -
@@ -99,4 +99,6 @@ export class BtcTransactionService {
       outputs: R.map(getAddress)(outputs),
     });
   }
+
+  async createRawTransaction() {}
 }

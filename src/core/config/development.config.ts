@@ -17,7 +17,7 @@ export default {
   },
   bitcoin: {
     main: 'http://192.168.4.148:8332',
-    test: 'http://192.168.4.147:8332',
+    test: 'http://127.0.0.1:18332',
     header: {
       Authorization: 'Basic ' + 'dXNlcjoxMjM0NTY=',
       Connection: 'keep-alive',
