@@ -3,7 +3,7 @@ import { asAddress } from '../../../shared/utils/tools';
 import { BitcoinService } from '../bitcoin.service';
 import * as R from 'ramda';
 import * as moment from 'moment';
-import { object } from '@hapi/joi';
+
 type vin = {
   txid: string;
   vout: number;
