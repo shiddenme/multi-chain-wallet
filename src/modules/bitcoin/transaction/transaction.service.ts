@@ -3,6 +3,7 @@ import { asAddress } from '../../../shared/utils/tools';
 import { BitcoinService } from '../bitcoin.service';
 import * as R from 'ramda';
 import * as moment from 'moment';
+import { object } from '@hapi/joi';
 type vin = {
   txid: string;
   vout: number;
@@ -102,5 +103,23 @@ export class BtcTransactionService {
 
   async createRawTransaction(body) {
     const { inputs, outputs, locktime } = body;
+    const keys = Object.keys(outputs);
+    console.log(keys);
+    if (keys.length !== 1 || !asAddress(keys[0])) {
+      throw new HttpException('isvalid address', 400);
+    }
+    const params = [];
+    params.push(inputs);
+    params.push(outputs);
+    if (locktime) {
+      params.push(locktime);
+    }
+    const rawTransaction = await this.btcService.sendRequest(
+      'createrawtransaction',
+      params,
+    );
+    return {
+      rawTransaction,
+    };
   }
 }

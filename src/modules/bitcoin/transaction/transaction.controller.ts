@@ -11,9 +11,9 @@ import {
 
 import { BtcTransactionService } from './transaction.service';
 import { HttpExceptionFilter } from '../../../core';
-import { IsNotEmpty, IsArray } from 'class-validator';
+import { IsNotEmpty } from 'class-validator';
 import { rawTransactionInputs } from '../../../core/validate';
-import { type } from 'os';
+
 class findTransactionDto {
   @IsNotEmpty({ message: '钱包地址为空' })
   wallet: string;
@@ -31,8 +31,9 @@ type utxo = {
 };
 class rawTransactionDto {
   @IsNotEmpty({ message: '输入数组为空' })
-  @rawTransactionInputs({ message: '输入数据错误' })
+  @rawTransactionInputs({ message: '输入数据格式错误' })
   inputs: utxo[];
+  @IsNotEmpty({ message: '输出为空' })
   outputs: object;
   locktime: number;
 }

@@ -9,6 +9,7 @@ type vinId = {
   voutIndex: number;
 };
 import * as R from 'ramda';
+import { object } from '@hapi/joi';
 
 @Injectable()
 export class BitcoinService {
@@ -36,8 +37,7 @@ export class BitcoinService {
         .toPromise();
       return res.data.result;
     } catch (e) {
-      console.log(e);
-      throw new HttpException('节点请求错误', 500);
+      throw new HttpException(e.response.data.error.message, 500);
     }
   }
 
