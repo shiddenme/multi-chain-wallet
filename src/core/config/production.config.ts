@@ -23,6 +23,6 @@ export default {
       Connection: 'keep-alive',
       'Content-Type': 'application/json',
     },
-    addressApi: 'blockchain.com',
+    addressApi: 'blockchair.com',
   },
 };
