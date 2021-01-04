@@ -13,6 +13,7 @@ import { BtcTransactionService } from './transaction.service';
 import { HttpExceptionFilter } from '../../../core';
 import { IsNotEmpty, IsArray } from 'class-validator';
 import { rawTransactionInputs } from '../../../core/validate';
+import { type } from 'os';
 class findTransactionDto {
   @IsNotEmpty({ message: '钱包地址为空' })
   wallet: string;
@@ -23,11 +24,15 @@ class paramDto {
   @IsNotEmpty({ message: 'id不能为空' })
   txid: string;
 }
-
+type utxo = {
+  txid: string;
+  vout: number;
+  Sequence?: number;
+};
 class rawTransactionDto {
   @IsNotEmpty({ message: '输入数组为空' })
   @rawTransactionInputs({ message: '输入数据错误' })
-  inputs: object[];
+  inputs: utxo[];
   outputs: object;
   locktime: number;
 }
@@ -57,13 +62,12 @@ export class BtcTransactionController {
   @UseFilters(new HttpExceptionFilter())
   async getTransactionDetail(@Param() param: paramDto) {
     const { txid } = param;
-    return this.transactionService.getTransactionDetail(txid);
+    return await this.transactionService.getTransactionDetail(txid);
   }
 
   @Post('/transaction')
   @UseFilters(new HttpExceptionFilter())
   async createRawTransaction(@Body() body: rawTransactionDto) {
-    const { inputs, outputs, locktime } = body;
-    return this.transactionService.createRawTransaction();
+    return await this.transactionService.createRawTransaction(body);
   }
 }

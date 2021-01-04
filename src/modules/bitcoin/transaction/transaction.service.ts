@@ -100,5 +100,7 @@ export class BtcTransactionService {
     });
   }
 
-  async createRawTransaction() {}
+  async createRawTransaction(body) {
+    const { inputs, outputs, locktime } = body;
+  }
 }

@@ -1,8 +1,4 @@
-import {
-  registerDecorator,
-  ValidationOptions,
-  ValidationArguments,
-} from 'class-validator';
+import { registerDecorator, ValidationOptions } from 'class-validator';
 
 export function rawTransactionInputs(validationOptions?: ValidationOptions) {
   return function (object: Object, propertyName: string) {
@@ -13,7 +9,16 @@ export function rawTransactionInputs(validationOptions?: ValidationOptions) {
       options: validationOptions,
       validator: {
         validate(value: any) {
-          return Array.isArray(value); // you can return a Promise<boolean> here as well, if you want to make async validation
+          if (!Array.isArray(value) || value.length < 1) {
+            return false;
+          }
+          for (let i = 0; i < value.length; i++) {
+            const { txid, vout } = value[i];
+            if (!txid || !vout || txid.length !== 64) {
+              return false;
+            }
+          }
+          return true;
         },
       },
     });
