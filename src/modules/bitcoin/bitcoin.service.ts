@@ -9,7 +9,6 @@ type vinId = {
   voutIndex: number;
 };
 import * as R from 'ramda';
-import { object } from '@hapi/joi';
 
 @Injectable()
 export class BitcoinService {
