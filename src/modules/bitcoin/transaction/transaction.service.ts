@@ -192,6 +192,15 @@ export class BtcTransactionService {
     const btc2usd = await this.redis.get('btc2usd');
     const usd2cny = await this.redis.get('usd2cny');
     const tokens = [];
+    const json: any = {};
+    json.introduce =
+      '比特币(BTC)是一种点对点的去中心化的数值货币,是人类历史上第一个真正的数字货币';
+    json.projectName = 'BTC';
+    json.officialWebsite = 'https://btc.com';
+    json.contractAddress = '';
+    json.tripartiteRating = '';
+    json.publishTime = '2009-01-19 10:54:25';
+    json.totalIssuance = 21000000;
     tokens.push({
       symbol: 'BTC',
       name: 'bitcoin',
@@ -202,6 +211,7 @@ export class BtcTransactionService {
       icon: 'http://192.168.4.147:3000/images/btc.jpg',
       price: (parseFloat(btc2usd) * parseFloat(usd2cny)).toFixed(2),
       balance: balanceSat * Math.pow(10, -8),
+      details: json,
     });
     return {
       tokens,

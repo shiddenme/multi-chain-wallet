@@ -8,7 +8,7 @@ const pool = mysql.createPool({
 })
 const promisePool = pool.promise();
 
-async function spider() {
+async function createTransactionTable() {
     const tokens = await promisePool.query(`select sort,contract from eth_token`);
     await Promise.all(tokens[0].map(async ele => { 
         const { sort } = ele;
@@ -39,4 +39,18 @@ async function spider() {
     }))
     promisePool.end()
 }
-spider()
+async function  updateToken() {
+    const json = {};
+    json.introduce = ''
+    json.projectName = ''
+    json.officialWebsite = ''
+    json.contractAddress = ''
+    json.tripartiteRating = ''
+    json.publishTime = ''
+    json.totalIssuance = ''
+    const sql = `update eth_token set details = '${JSON.stringify(json)}' where sort = 5`;
+    console.log('sql =', sql);
+    await promisePool.query(sql)
+    await  promisePool.end()
+}
+updateToken()

@@ -35,4 +35,9 @@ export class sipc_token extends Model<sipc_token> {
     type: DataType.INTEGER,
   })
   public sort: number;
+
+  @Column({
+    type: DataType.JSON,
+  })
+  public details: string;
 }

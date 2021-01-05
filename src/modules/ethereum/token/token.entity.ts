@@ -35,4 +35,9 @@ export class eth_token extends Model<eth_token> {
     type: DataType.INTEGER,
   })
   public sort: number;
+
+  @Column({
+    type: DataType.JSON,
+  })
+  public details: string;
 }
