@@ -5,11 +5,18 @@ import {
   EthBlockModule,
   EthTransactionModule,
   EthTokenModule,
+  EthCrossModule,
 } from '../../modules';
 
 @Global()
 @Module({
-  imports: [EthBlockModule, EthTokenModule, EthTransactionModule, ConfigModule],
+  imports: [
+    EthBlockModule,
+    EthTokenModule,
+    EthTransactionModule,
+    ConfigModule,
+    EthCrossModule,
+  ],
   providers: [Web3Service],
   exports: [Web3Service],
 })

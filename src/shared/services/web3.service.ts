@@ -1,4 +1,4 @@
-import { Injectable, HttpException, Logger } from '@nestjs/common';
+import { Injectable, HttpException } from '@nestjs/common';
 import { ConfigService } from '../../core';
 
 import { EthTransactionService, EthTokenService } from '../../modules';
@@ -7,9 +7,12 @@ import { sleep } from '../utils';
 import * as R from 'ramda';
 
 const Web3 = require('web3');
-const BN = require('bn.js');
+
 import { erc20AbI } from '../abi/erc20';
+import { crossAbI } from '../abi/cross';
+import * as Tx from 'ethereumjs-tx';
 class parseDto {
+  internalType?: string;
   type: string;
   name: string;
 }
@@ -25,9 +28,6 @@ export class Web3Service {
   public readonly slc = new Web3(
     new Web3.providers.HttpProvider(this.config.get('web3')['slcServer']),
   );
-  private readonly logger = new Logger(Web3Service.name);
-  public readonly web3Contract = new this.web3.eth.Contract(erc20AbI);
-  public readonly sipcContract = new this.sipc.eth.Contract(erc20AbI);
 
   constructor(
     private readonly ethTokenService: EthTokenService,
@@ -75,7 +75,7 @@ export class Web3Service {
       if (!contract || contract === '0x') {
         return '18';
       }
-      const myContract = f ? this.web3Contract : this.sipcContract;
+      const myContract = this.getContract('erc20', f);
       myContract.options.address = contract;
 
       return await myContract.methods.decimals().call();
@@ -238,27 +238,11 @@ export class Web3Service {
     await this.listenBlockTransactions(blockNumber + 1);
   }
 
-  getGasInBlock(transactions) {
-    let length = transactions.length;
-    if (length === 0) {
-      return 0;
-    }
-    let txsFee = 0;
-    for (let i = 0; i < length; i++) {
-      const bigFee = new BN(transactions[i].gas).mul(
-        new BN(transactions[i].gasPrice),
-      );
-      const fee = this.web3.utils.fromWei(bigFee);
-      txsFee += parseFloat(fee);
-    }
-    return txsFee;
-  }
-
   // 编码erc20交易函数
   async getTransfer(transactionObject) {
     try {
       const { to, value } = transactionObject;
-      const myContract = this.web3Contract;
+      const myContract = this.getContract('erc20', true);
       const data = myContract.methods.transfer(to, value).encodeABI();
 
       return data;
@@ -270,5 +254,82 @@ export class Web3Service {
 
   decodeParameters(parse: parseDto[], input: string) {
     return this.web3.eth.abi.decodeParameters(parse, input);
+  }
+
+  getContract(type: string, f: boolean) {
+    const abi = type === 'cross' ? crossAbI : erc20AbI;
+    const server = f ? this.web3 : this.sipc;
+    return new server.eth.Contract(abi);
+  }
+  getRpcServer(crossChainId: number) {
+    const chain = crossChainId === 3 ? 'ehereum' : 'simplechain';
+    console.log('chain =', chain);
+    return new Web3(
+      new Web3.providers.HttpProvider(
+        this.config.get('cross')[chain]['rpcServer'],
+      ),
+    );
+  }
+
+  async makeCrossTxn(query) {
+    // simplechain 的chainId为3 ethereum的为1
+    const { crossChainId = 3, destValue, from, to = '', input = '' } = query;
+    const myContract = this.getContract('cross', true);
+    const data = myContract.methods
+      .makerStart(destValue, crossChainId, [from, to], Buffer.from(input))
+      .encodeABI();
+    const chain = crossChainId == 3 ? 'ehereum' : 'simplechain';
+    const contractAddress =
+      crossChainId == 3
+        ? '0xB7F31CA6211cD8E4F72d85d95B70aFfE6421dE46'
+        : '0x1616A39BB53a9D2F5d7930E64a4F67beF0dc40B3';
+    return {
+      crossTxn: data,
+      server: this.config.get('cross')[chain]['rpcServer'],
+      contractAddress,
+    };
+  }
+
+  async takeCrossTxn(query) {
+    const { to, input = '', crossChainId } = query;
+    const ctx = {
+      txId:
+        '0x72381efa608e5d075f24b9c8b78e5e38dc6ed7b3c9a4cb1155be352708665499',
+      txHash:
+        '0xbd8944b8b90daa1bad33276f057a33886d305da6e9d9e7e2b1c0ed68601cd5b3',
+      blockHash:
+        '0x0ecfad2fe2fe9c0446c81b2a07993e440d704d27c77ccbfd12cc0e2fb1c942e2',
+      value: '0x0',
+      charge: '0xde0b6b3a7640000',
+      from: '0xf58dcccd64c19e5f0349e51a3d02af5932c0609b',
+      to: '0xf58dcccd64c19e5f0349e51a3d02af5932c0609b',
+      origin: '0x3',
+      purpose: '0x1',
+      payload: '0x',
+      time: '0x5ff55850',
+      v: ['0x26', '0x25'],
+      r: [
+        '0x1d9631e7218812589b7d77478169a46b1feb7ff4e4134096d5e58e344944632b',
+        '0xaf7fb37785a854143d1f84a4a0e2750c3d06003079a30488748ccb0baacc22aa',
+      ],
+      s: [
+        '0x1b3aa53b4050ff743db0bd706a3fbf06178f3249de172820256f623e71cfae38',
+        '0x193226e8b649af1ce04ddff9e3a6ff02504c9a06cedf563fed0dc9a0137054f7',
+      ],
+    };
+    const myContract = this.getContract('cross', true);
+    const chain = crossChainId == 3 ? 'ehereum' : 'simplechain';
+    const contractAddress =
+      crossChainId == 3
+        ? '0xB7F31CA6211cD8E4F72d85d95B70aFfE6421dE46'
+        : '0x1616A39BB53a9D2F5d7930E64a4F67beF0dc40B3';
+    const data = myContract.methods
+      .taker(ctx, to, Buffer.from(input))
+      .encodeABI();
+    return {
+      crossTxn: data,
+      server: this.config.get('cross')[chain]['rpcServer'],
+      contractAddress,
+    };
   }
 }

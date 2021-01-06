@@ -151,6 +151,14 @@ export class BtcTransactionService {
         vout,
       });
     }
+    for (let i = 0; i < inputs.length; i++) {
+      const { txid, vout } = inputs[i];
+      const voutDetail = await this.btcService.sendRequest('gettxout', [
+        txid,
+        vout,
+      ]);
+      inputs[i].scriptPubKey = voutDetail.scriptPubKey.hex;
+    }
     // 找零
     const amountToKeep = sumInput - sumOutput;
     if (amountToKeep !== 0) {
@@ -168,6 +176,7 @@ export class BtcTransactionService {
     );
     return {
       rawTransaction,
+      inputs,
     };
   }
 

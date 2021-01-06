@@ -1,634 +1,942 @@
 export const crossAbI = [
   {
-    "inputs": [],
-    "stateMutability": "nonpayable",
-    "type": "constructor"
+    inputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'constructor',
   },
   {
-    "anonymous": false,
-    "inputs": [
+    anonymous: false,
+    inputs: [
       {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "remoteChainId",
-        "type": "uint256"
+        indexed: false,
+        internalType: 'uint8',
+        name: 'purpose',
+        type: 'uint8',
       },
       {
-        "indexed": true,
-        "internalType": "address",
-        "name": "anchor",
-        "type": "address"
+        indexed: false,
+        internalType: 'address',
+        name: 'anchor',
+        type: 'address',
       },
       {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "reward",
-        "type": "uint256"
-      }
+        indexed: false,
+        internalType: 'uint256',
+        name: 'reward',
+        type: 'uint256',
+      },
     ],
-    "name": "AccumulateRewards",
-    "type": "event"
+    name: 'AccumulateRewards',
+    type: 'event',
   },
   {
-    "anonymous": false,
-    "inputs": [
+    anonymous: false,
+    inputs: [
       {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "remoteChainId",
-        "type": "uint256"
-      }
+        indexed: false,
+        internalType: 'uint8',
+        name: 'purpose',
+        type: 'uint8',
+      },
     ],
-    "name": "AddAnchors",
-    "type": "event"
+    name: 'AddAnchors',
+    type: 'event',
   },
   {
-    "anonymous": false,
-    "inputs": [
+    anonymous: false,
+    inputs: [
       {
-        "indexed": true,
-        "internalType": "bytes32",
-        "name": "txId",
-        "type": "bytes32"
+        indexed: false,
+        internalType: 'bytes32',
+        name: 'txId',
+        type: 'bytes32',
       },
       {
-        "indexed": true,
-        "internalType": "address",
-        "name": "to",
-        "type": "address"
-      }
+        indexed: false,
+        internalType: 'address',
+        name: 'to',
+        type: 'address',
+      },
     ],
-    "name": "MakerFinish",
-    "type": "event"
+    name: 'MakerFinish',
+    type: 'event',
   },
   {
-    "anonymous": false,
-    "inputs": [
+    anonymous: false,
+    inputs: [
       {
-        "indexed": true,
-        "internalType": "bytes32",
-        "name": "txId",
-        "type": "bytes32"
+        indexed: false,
+        internalType: 'bytes32',
+        name: 'txId',
+        type: 'bytes32',
       },
       {
-        "indexed": true,
-        "internalType": "address",
-        "name": "from",
-        "type": "address"
+        indexed: false,
+        internalType: 'uint256',
+        name: 'value',
+        type: 'uint256',
       },
       {
-        "indexed": false,
-        "internalType": "address",
-        "name": "to",
-        "type": "address"
+        indexed: false,
+        internalType: 'uint256',
+        name: 'destValue',
+        type: 'uint256',
       },
       {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "remoteChainId",
-        "type": "uint256"
+        indexed: false,
+        internalType: 'string',
+        name: 'from',
+        type: 'string',
       },
       {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "value",
-        "type": "uint256"
+        indexed: false,
+        internalType: 'string',
+        name: 'to',
+        type: 'string',
       },
       {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "destValue",
-        "type": "uint256"
+        indexed: false,
+        internalType: 'uint8',
+        name: 'purpose',
+        type: 'uint8',
       },
       {
-        "indexed": false,
-        "internalType": "bytes",
-        "name": "data",
-        "type": "bytes"
-      }
+        indexed: false,
+        internalType: 'bytes',
+        name: 'payload',
+        type: 'bytes',
+      },
     ],
-    "name": "MakerTx",
-    "type": "event"
+    name: 'MakerTx',
+    type: 'event',
   },
   {
-    "anonymous": false,
-    "inputs": [
+    anonymous: false,
+    inputs: [
       {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "remoteChainId",
-        "type": "uint256"
-      }
+        indexed: false,
+        internalType: 'uint8',
+        name: 'purpose',
+        type: 'uint8',
+      },
     ],
-    "name": "RemoveAnchors",
-    "type": "event"
+    name: 'RemoveAnchors',
+    type: 'event',
   },
   {
-    "anonymous": false,
-    "inputs": [
+    anonymous: false,
+    inputs: [
       {
-        "indexed": true,
-        "internalType": "bytes32",
-        "name": "txId",
-        "type": "bytes32"
+        indexed: false,
+        internalType: 'uint8',
+        name: 'purpose',
+        type: 'uint8',
       },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "to",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "remoteChainId",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "from",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "value",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "destValue",
-        "type": "uint256"
-      }
     ],
-    "name": "TakerTx",
-    "type": "event"
+    name: 'SetAnchorStatus',
+    type: 'event',
   },
   {
-    "inputs": [
+    anonymous: false,
+    inputs: [
       {
-        "internalType": "uint256",
-        "name": "remoteChainId",
-        "type": "uint256"
+        indexed: false,
+        internalType: 'bytes32',
+        name: 'txId',
+        type: 'bytes32',
       },
       {
-        "internalType": "address payable",
-        "name": "anchor",
-        "type": "address"
+        indexed: false,
+        internalType: 'address',
+        name: 'from',
+        type: 'address',
       },
       {
-        "internalType": "uint256",
-        "name": "reward",
-        "type": "uint256"
-      }
+        indexed: false,
+        internalType: 'address',
+        name: 'to',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'string',
+        name: 'taker',
+        type: 'string',
+      },
+      {
+        indexed: false,
+        internalType: 'uint8',
+        name: 'purpose',
+        type: 'uint8',
+      },
+      {
+        indexed: false,
+        internalType: 'bytes',
+        name: 'payload',
+        type: 'bytes',
+      },
     ],
-    "name": "accumulateRewards",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
+    name: 'TakerTx',
+    type: 'event',
   },
   {
-    "inputs": [
+    anonymous: false,
+    inputs: [
       {
-        "internalType": "uint256",
-        "name": "remoteChainId",
-        "type": "uint256"
+        indexed: false,
+        internalType: 'uint8',
+        name: 'purpose',
+        type: 'uint8',
       },
-      {
-        "internalType": "address[]",
-        "name": "_anchors",
-        "type": "address[]"
-      }
     ],
-    "name": "addAnchors",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
+    name: 'UpdateRouter',
+    type: 'event',
   },
   {
-    "inputs": [
+    constant: false,
+    inputs: [
       {
-        "internalType": "uint64",
-        "name": "n",
-        "type": "uint64"
-      }
-    ],
-    "name": "bitCount",
-    "outputs": [
+        internalType: 'uint8',
+        name: 'purpose',
+        type: 'uint8',
+      },
       {
-        "internalType": "uint64",
-        "name": "",
-        "type": "uint64"
-      }
+        internalType: 'address payable',
+        name: 'anchor',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'reward',
+        type: 'uint256',
+      },
     ],
-    "stateMutability": "pure",
-    "type": "function"
+    name: 'accumulateRewards',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
-    "inputs": [],
-    "name": "chainId",
-    "outputs": [
+    constant: false,
+    inputs: [
       {
-        "internalType": "uint256",
-        "name": "id",
-        "type": "uint256"
-      }
+        internalType: 'uint8',
+        name: 'purpose',
+        type: 'uint8',
+      },
+      {
+        internalType: 'address[]',
+        name: 'anchors',
+        type: 'address[]',
+      },
     ],
-    "stateMutability": "pure",
-    "type": "function"
+    name: 'addAnchors',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
-    "inputs": [
+    constant: false,
+    inputs: [
       {
-        "internalType": "uint256",
-        "name": "remoteChainId",
-        "type": "uint256"
+        internalType: 'uint8',
+        name: 'purpose',
+        type: 'uint8',
       },
       {
-        "internalType": "uint8",
-        "name": "signConfirmCount",
-        "type": "uint8"
+        internalType: 'address',
+        name: 'router',
+        type: 'address',
       },
-      {
-        "internalType": "address[]",
-        "name": "_anchors",
-        "type": "address[]"
-      }
     ],
-    "name": "chainRegister",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
+    name: 'addRouter',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
-    "inputs": [
+    constant: true,
+    inputs: [
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
+        internalType: 'uint64',
+        name: 'n',
+        type: 'uint64',
+      },
     ],
-    "name": "crossChains",
-    "outputs": [
+    name: 'bitCount',
+    outputs: [
       {
-        "internalType": "uint256",
-        "name": "remoteChainId",
-        "type": "uint256"
+        internalType: 'uint64',
+        name: '',
+        type: 'uint64',
       },
-      {
-        "internalType": "uint8",
-        "name": "signConfirmCount",
-        "type": "uint8"
-      },
-      {
-        "internalType": "uint64",
-        "name": "anchorsPositionBit",
-        "type": "uint64"
-      },
-      {
-        "internalType": "uint64",
-        "name": "delsPositionBit",
-        "type": "uint64"
-      },
-      {
-        "internalType": "uint8",
-        "name": "delId",
-        "type": "uint8"
-      },
-      {
-        "internalType": "uint256",
-        "name": "reward",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "totalReward",
-        "type": "uint256"
-      }
     ],
-    "stateMutability": "view",
-    "type": "function"
+    payable: false,
+    stateMutability: 'pure',
+    type: 'function',
   },
   {
-    "inputs": [
+    constant: false,
+    inputs: [
       {
-        "internalType": "uint256",
-        "name": "remoteChainId",
-        "type": "uint256"
-      }
-    ],
-    "name": "getAnchors",
-    "outputs": [
-      {
-        "internalType": "address[]",
-        "name": "",
-        "type": "address[]"
+        internalType: 'uint8',
+        name: 'purpose',
+        type: 'uint8',
       },
       {
-        "internalType": "uint8",
-        "name": "",
-        "type": "uint8"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "txId",
-        "type": "bytes32"
+        internalType: 'uint256',
+        name: 'maxValue',
+        type: 'uint256',
       },
       {
-        "internalType": "uint256",
-        "name": "remoteChainId",
-        "type": "uint256"
-      }
-    ],
-    "name": "getMakerTx",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "txId",
-        "type": "bytes32"
+        internalType: 'uint256',
+        name: 'networkId',
+        type: 'uint256',
       },
       {
-        "internalType": "uint256",
-        "name": "remoteChainId",
-        "type": "uint256"
-      }
-    ],
-    "name": "getTakerTx",
-    "outputs": [
+        internalType: 'uint8',
+        name: 'signConfirmCount',
+        type: 'uint8',
+      },
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
+        internalType: 'address[]',
+        name: 'anchors',
+        type: 'address[]',
+      },
+      {
+        internalType: 'address[]',
+        name: 'routers',
+        type: 'address[]',
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
+    name: 'chainRegister',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
-    "inputs": [
+    constant: true,
+    inputs: [
       {
-        "internalType": "uint256",
-        "name": "remoteChainId",
-        "type": "uint256"
-      }
+        internalType: 'uint8',
+        name: '',
+        type: 'uint8',
+      },
     ],
-    "name": "getTotalReward",
-    "outputs": [
+    name: 'crossChains',
+    outputs: [
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
+        internalType: 'uint8',
+        name: 'purpose',
+        type: 'uint8',
+      },
+      {
+        internalType: 'uint8',
+        name: 'signConfirmCount',
+        type: 'uint8',
+      },
+      {
+        internalType: 'uint256',
+        name: 'maxValue',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint64',
+        name: 'anchorsPositionBit',
+        type: 'uint64',
+      },
+      {
+        internalType: 'uint64',
+        name: 'delsPositionBit',
+        type: 'uint64',
+      },
+      {
+        internalType: 'uint8',
+        name: 'delId',
+        type: 'uint8',
+      },
+      {
+        internalType: 'uint256',
+        name: 'reward',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'totalReward',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'signerId',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'count',
+        type: 'uint256',
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
   },
   {
-    "inputs": [],
-    "name": "list",
-    "outputs": [
+    constant: false,
+    inputs: [
       {
-        "internalType": "uint256",
-        "name": "ll",
-        "type": "uint256"
-      }
+        internalType: 'uint8',
+        name: 'purpose',
+        type: 'uint8',
+      },
+      {
+        internalType: 'address',
+        name: 'router',
+        type: 'address',
+      },
     ],
-    "stateMutability": "pure",
-    "type": "function"
+    name: 'delRouter',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
-    "inputs": [
+    constant: true,
+    inputs: [
       {
-        "components": [
+        internalType: 'uint8',
+        name: 'purpose',
+        type: 'uint8',
+      },
+      {
+        internalType: 'address',
+        name: 'anchor',
+        type: 'address',
+      },
+    ],
+    name: 'getAnchorWorkCount',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: 'signCount',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'finishCount',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        internalType: 'uint8',
+        name: 'purpose',
+        type: 'uint8',
+      },
+    ],
+    name: 'getAnchors',
+    outputs: [
+      {
+        internalType: 'address[]',
+        name: 'anchors',
+        type: 'address[]',
+      },
+      {
+        internalType: 'uint8',
+        name: 'count',
+        type: 'uint8',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        internalType: 'uint8',
+        name: 'purpose',
+        type: 'uint8',
+      },
+    ],
+    name: 'getChainReward',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        internalType: 'uint8',
+        name: 'purpose',
+        type: 'uint8',
+      },
+      {
+        internalType: 'address',
+        name: 'anchor',
+        type: 'address',
+      },
+    ],
+    name: 'getDelAnchorSignCount',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        internalType: 'bytes32',
+        name: 'txId',
+        type: 'bytes32',
+      },
+      {
+        internalType: 'uint8',
+        name: 'purpose',
+        type: 'uint8',
+      },
+    ],
+    name: 'getMakerTx',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        internalType: 'uint8',
+        name: 'purpose',
+        type: 'uint8',
+      },
+    ],
+    name: 'getMaxValue',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        internalType: 'uint8',
+        name: 'purpose',
+        type: 'uint8',
+      },
+    ],
+    name: 'getRouter',
+    outputs: [
+      {
+        internalType: 'address[]',
+        name: 'routers',
+        type: 'address[]',
+      },
+      {
+        internalType: 'uint8',
+        name: 'count',
+        type: 'uint8',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        internalType: 'bytes32',
+        name: 'txId',
+        type: 'bytes32',
+      },
+      {
+        internalType: 'address',
+        name: 'from',
+        type: 'address',
+      },
+      {
+        internalType: 'uint8',
+        name: 'purpose',
+        type: 'uint8',
+      },
+    ],
+    name: 'getTakerTx',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        internalType: 'uint8',
+        name: 'purpose',
+        type: 'uint8',
+      },
+    ],
+    name: 'getTotalReward',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        components: [
           {
-            "internalType": "bytes32",
-            "name": "txId",
-            "type": "bytes32"
+            internalType: 'bytes32',
+            name: 'txId',
+            type: 'bytes32',
           },
           {
-            "internalType": "bytes32",
-            "name": "txHash",
-            "type": "bytes32"
+            internalType: 'bytes32',
+            name: 'txHash',
+            type: 'bytes32',
           },
           {
-            "internalType": "address payable",
-            "name": "from",
-            "type": "address"
+            internalType: 'string',
+            name: 'from',
+            type: 'string',
           },
           {
-            "internalType": "address payable",
-            "name": "to",
-            "type": "address"
-          }
+            internalType: 'string',
+            name: 'to',
+            type: 'string',
+          },
+          {
+            internalType: 'address payable',
+            name: 'taker',
+            type: 'address',
+          },
+          {
+            internalType: 'uint8',
+            name: 'origin',
+            type: 'uint8',
+          },
+          {
+            internalType: 'uint8',
+            name: 'purpose',
+            type: 'uint8',
+          },
+          {
+            internalType: 'bytes',
+            name: 'data',
+            type: 'bytes',
+          },
         ],
-        "internalType": "struct crossDemo.Recept",
-        "name": "rtx",
-        "type": "tuple"
+        internalType: 'struct CrossStruct.Recept',
+        name: 'rtx',
+        type: 'tuple',
       },
-      {
-        "internalType": "uint256",
-        "name": "remoteChainId",
-        "type": "uint256"
-      }
     ],
-    "name": "makerFinish",
-    "outputs": [],
-    "stateMutability": "payable",
-    "type": "function"
+    name: 'makerFinish',
+    outputs: [],
+    payable: true,
+    stateMutability: 'payable',
+    type: 'function',
   },
   {
-    "inputs": [
+    constant: false,
+    inputs: [
       {
-        "internalType": "uint256",
-        "name": "remoteChainId",
-        "type": "uint256"
+        internalType: 'uint256',
+        name: 'destValue',
+        type: 'uint256',
       },
       {
-        "internalType": "uint256",
-        "name": "destValue",
-        "type": "uint256"
+        internalType: 'uint8',
+        name: 'purpose',
+        type: 'uint8',
       },
       {
-        "internalType": "address payable",
-        "name": "focus",
-        "type": "address"
+        internalType: 'string[2]',
+        name: 'arg',
+        type: 'string[2]',
       },
       {
-        "internalType": "bytes",
-        "name": "data",
-        "type": "bytes"
-      }
+        internalType: 'bytes',
+        name: 'data',
+        type: 'bytes',
+      },
     ],
-    "name": "makerStart",
-    "outputs": [],
-    "stateMutability": "payable",
-    "type": "function"
+    name: 'makerStart',
+    outputs: [],
+    payable: true,
+    stateMutability: 'payable',
+    type: 'function',
   },
   {
-    "inputs": [],
-    "name": "owner",
-    "outputs": [
+    constant: true,
+    inputs: [],
+    name: 'owner',
+    outputs: [
       {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
   },
   {
-    "inputs": [
+    constant: false,
+    inputs: [
       {
-        "internalType": "uint256",
-        "name": "remoteChainId",
-        "type": "uint256"
+        internalType: 'uint8',
+        name: 'purpose',
+        type: 'uint8',
       },
       {
-        "internalType": "address[]",
-        "name": "_anchors",
-        "type": "address[]"
-      }
+        internalType: 'address[]',
+        name: 'anchors',
+        type: 'address[]',
+      },
     ],
-    "name": "removeAnchors",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
+    name: 'removeAnchors',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
-    "inputs": [
+    constant: false,
+    inputs: [
       {
-        "internalType": "uint256",
-        "name": "remoteChainId",
-        "type": "uint256"
+        internalType: 'uint8',
+        name: 'purpose',
+        type: 'uint8',
       },
       {
-        "internalType": "uint256",
-        "name": "_reward",
-        "type": "uint256"
-      }
-    ],
-    "name": "setReward",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "remoteChainId",
-        "type": "uint256"
+        internalType: 'address',
+        name: 'anchor',
+        type: 'address',
       },
       {
-        "internalType": "uint8",
-        "name": "count",
-        "type": "uint8"
-      }
+        internalType: 'bool',
+        name: 'status',
+        type: 'bool',
+      },
     ],
-    "name": "setSignConfirmCount",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
+    name: 'setAnchorStatus',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
-    "inputs": [
+    constant: false,
+    inputs: [
       {
-        "components": [
+        internalType: 'uint8',
+        name: 'purpose',
+        type: 'uint8',
+      },
+      {
+        internalType: 'uint256',
+        name: 'maxValue',
+        type: 'uint256',
+      },
+    ],
+    name: 'setMaxValue',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        internalType: 'uint8',
+        name: 'purpose',
+        type: 'uint8',
+      },
+      {
+        internalType: 'uint256',
+        name: 'reward',
+        type: 'uint256',
+      },
+    ],
+    name: 'setReward',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        internalType: 'uint8',
+        name: 'purpose',
+        type: 'uint8',
+      },
+      {
+        internalType: 'uint8',
+        name: 'count',
+        type: 'uint8',
+      },
+    ],
+    name: 'setSignConfirmCount',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        components: [
           {
-            "internalType": "uint256",
-            "name": "value",
-            "type": "uint256"
+            internalType: 'bytes32',
+            name: 'txId',
+            type: 'bytes32',
           },
           {
-            "internalType": "bytes32",
-            "name": "txId",
-            "type": "bytes32"
+            internalType: 'bytes32',
+            name: 'txHash',
+            type: 'bytes32',
           },
           {
-            "internalType": "bytes32",
-            "name": "txHash",
-            "type": "bytes32"
+            internalType: 'bytes32',
+            name: 'blockHash',
+            type: 'bytes32',
           },
           {
-            "internalType": "address payable",
-            "name": "from",
-            "type": "address"
+            internalType: 'uint256',
+            name: 'value',
+            type: 'uint256',
           },
           {
-            "internalType": "address",
-            "name": "to",
-            "type": "address"
+            internalType: 'uint256',
+            name: 'charge',
+            type: 'uint256',
           },
           {
-            "internalType": "bytes32",
-            "name": "blockHash",
-            "type": "bytes32"
+            internalType: 'address payable',
+            name: 'from',
+            type: 'address',
           },
           {
-            "internalType": "uint256",
-            "name": "destinationValue",
-            "type": "uint256"
+            internalType: 'address',
+            name: 'to',
+            type: 'address',
           },
           {
-            "internalType": "bytes",
-            "name": "data",
-            "type": "bytes"
+            internalType: 'uint8',
+            name: 'origin',
+            type: 'uint8',
           },
           {
-            "internalType": "uint256[]",
-            "name": "v",
-            "type": "uint256[]"
+            internalType: 'uint8',
+            name: 'purpose',
+            type: 'uint8',
           },
           {
-            "internalType": "bytes32[]",
-            "name": "r",
-            "type": "bytes32[]"
+            internalType: 'bytes',
+            name: 'payload',
+            type: 'bytes',
           },
           {
-            "internalType": "bytes32[]",
-            "name": "s",
-            "type": "bytes32[]"
-          }
+            internalType: 'uint256[]',
+            name: 'v',
+            type: 'uint256[]',
+          },
+          {
+            internalType: 'bytes32[]',
+            name: 'r',
+            type: 'bytes32[]',
+          },
+          {
+            internalType: 'bytes32[]',
+            name: 's',
+            type: 'bytes32[]',
+          },
         ],
-        "internalType": "struct crossDemo.Order",
-        "name": "ctx",
-        "type": "tuple"
+        internalType: 'struct CrossStruct.Order',
+        name: 'ctx',
+        type: 'tuple',
       },
       {
-        "internalType": "uint256",
-        "name": "remoteChainId",
-        "type": "uint256"
-      }
+        internalType: 'string',
+        name: 'to',
+        type: 'string',
+      },
+      {
+        internalType: 'bytes',
+        name: 'data',
+        type: 'bytes',
+      },
     ],
-    "name": "taker",
-    "outputs": [],
-    "stateMutability": "payable",
-    "type": "function"
-  }
-]
+    name: 'taker',
+    outputs: [],
+    payable: true,
+    stateMutability: 'payable',
+    type: 'function',
+  },
+];

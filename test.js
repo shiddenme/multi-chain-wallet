@@ -1,47 +1,82 @@
 
-const R = require('ramda')
-var vin = [
-  {
-    "value": 0.00030129,
-    "n": 382,
-    "scriptPubKey": {
-        "asm": "OP_DUP OP_HASH160 226a8e86f16ed394f41e837e737183c9442d3405 OP_EQUALVERIFY OP_CHECKSIG",
-        "hex": "76a914226a8e86f16ed394f41e837e737183c9442d340588ac",
-        "reqSigs": 1,
-        "type": "pubkeyhash",
-        "addresses": [
-            "148ydDTXQVM8CEsYG34X8dUrV9vpe8zB5P"
-        ]
-    }
-},
-];
-var vout =  [
-  {
-      "value": 0.00030129,
-      "n": 382,
-      "scriptPubKey": {
-          "asm": "OP_DUP OP_HASH160 226a8e86f16ed394f41e837e737183c9442d3405 OP_EQUALVERIFY OP_CHECKSIG",
-          "hex": "76a914226a8e86f16ed394f41e837e737183c9442d340588ac",
-          "reqSigs": 1,
-          "type": "pubkeyhash",
-          "addresses": [
-              "148ydDTXQVM8CEsYG34X8dUrV9vpe8zB5P"
-          ]
-      }
-  },
-  {
-    "value": 0.00030129,
-    "n": 382,
-    "scriptPubKey": {
-        "asm": "OP_DUP OP_HASH160 226a8e86f16ed394f41e837e737183c9442d3405 OP_EQUALVERIFY OP_CHECKSIG",
-        "hex": "76a914226a8e86f16ed394f41e837e737183c9442d340588ac",
-        "reqSigs": 1,
-        "type": "pubkeyhash",
-        "addresses": [
-            "148ydDTXQVM8CEsYG34X8dUrV9vpe8zB5P"
-        ]
-    }
+const Web3 = require('web3')
+const Tx = require('ethereumjs-tx')
+
+async function makeCross(data, url, contractAddress) { 
+
+    const server = new Web3(new Web3.providers.HttpProvider(url));
+    console.log(server.eth.abi.decodeParameters([
+        {
+          internalType: 'uint256',
+          name: 'destValue',
+          type: 'uint256',
+        },
+        {
+          internalType: 'uint8',
+          name: 'purpose',
+          type: 'uint8',
+        },
+        {
+          internalType: 'string[2]',
+          name: 'arg',
+          type: 'string[2]',
+        },
+        {
+          internalType: 'bytes',
+          name: 'data',
+          type: 'bytes',
+        },
+      ], data.slice(10)))
+  const txnCount = await server.eth.getTransactionCount('0x1ee0eccd51516a9356b1a7699e179082d8c7d6c2');
+  console.log('txnCount =', txnCount);
+  const rawTx = {
+    from: '0x1ee0eccd51516a9356b1a7699e179082d8c7d6c2',
+    nonce: server.utils.toHex(txnCount),
+    gasPrice: server.utils.toHex(800000000000),
+    gasLimit: server.utils.toHex(160000),
+    to: contractAddress,
+    value: server.utils.toHex(0),
+    data,
+  };
+  console.log('rawTx =', rawTx);
+  const privateKey = Buffer.from(
+    '8714398edb40d9c688e34f9b73ffd05c5359293a5759c3efdca76f9c756c7b3b',
+    'hex',
+  );
+  let tx = new Tx(rawTx);
+  tx.sign(privateKey);
+  var serializedTx = tx.serialize();
+  server.eth
+    .sendSignedTransaction('0x' + serializedTx.toString('hex'))
+    .on('receipt', console.log);
 }
-]
-var a = R.reduce(R.add, 0)(R.map(R.prop('value'))(vin)) - R.reduce(R.add, 0)(R.map(R.prop('value'))(vout));
-console.log('a =',a)
+
+
+async function takeCross(data,url,contractAddress) { 
+  const server = new Web3(new Web3.providers.HttpProvider(url));
+  const txnCount = await server.eth.getTransactionCount('0xf58dcccd64c19e5f0349e51a3d02af5932c0609b');
+  console.log('txnCount =', txnCount);
+  const rawTx = {
+    from: '0xf58dcccd64c19e5f0349e51a3d02af5932c0609b',
+    nonce: server.utils.toHex(txnCount),
+    gasPrice: server.utils.toHex(800000000000),
+    gasLimit: server.utils.toHex(160000),
+    to: contractAddress,
+    value: server.utils.toHex(0),
+    data,
+  };
+  console.log('rawTx =', rawTx);
+  const privateKey = Buffer.from(
+    '1726014303832fc4f7c90cd0bcd2d672cd17dd941804330abc937ca1785c7412',
+    'hex',
+  );
+  let tx = new Tx(rawTx);
+  tx.sign(privateKey);
+  var serializedTx = tx.serialize();
+  server.eth
+    .sendSignedTransaction('0x' + serializedTx.toString('hex'))
+    .on('receipt', console.log);
+}
+
+
+takeCross(`0xb7df03cc0000000000000000000000000000000000000000000000000000000000000060000000000000000000000000000000000000000000000000000000000000034000000000000000000000000000000000000000000000000000000000000003a072381efa608e5d075f24b9c8b78e5e38dc6ed7b3c9a4cb1155be352708665499bd8944b8b90daa1bad33276f057a33886d305da6e9d9e7e2b1c0ed68601cd5b30ecfad2fe2fe9c0446c81b2a07993e440d704d27c77ccbfd12cc0e2fb1c942e200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000de0b6b3a7640000000000000000000000000000f58dcccd64c19e5f0349e51a3d02af5932c0609b000000000000000000000000f58dcccd64c19e5f0349e51a3d02af5932c0609b0000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000001a000000000000000000000000000000000000000000000000000000000000001c000000000000000000000000000000000000000000000000000000000000002200000000000000000000000000000000000000000000000000000000000000280000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000026000000000000000000000000000000000000000000000000000000000000002500000000000000000000000000000000000000000000000000000000000000021d9631e7218812589b7d77478169a46b1feb7ff4e4134096d5e58e344944632baf7fb37785a854143d1f84a4a0e2750c3d06003079a30488748ccb0baacc22aa00000000000000000000000000000000000000000000000000000000000000021b3aa53b4050ff743db0bd706a3fbf06178f3249de172820256f623e71cfae38193226e8b649af1ce04ddff9e3a6ff02504c9a06cedf563fed0dc9a0137054f7000000000000000000000000000000000000000000000000000000000000002a307861366335633032386637336261346534626630363263396232613161623264316330623837343664000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000`,'http://192.168.3.134:8545','0x1616A39BB53a9D2F5d7930E64a4F67beF0dc40B3')
