@@ -5,26 +5,19 @@ import {
   EthBlockModule,
   EthTransactionModule,
   EthTokenModule,
-  EthCrossModule,
 } from '../../modules';
 
 @Global()
 @Module({
-  imports: [
-    EthBlockModule,
-    EthTokenModule,
-    EthTransactionModule,
-    ConfigModule,
-    EthCrossModule,
-  ],
+  imports: [EthBlockModule, EthTokenModule, EthTransactionModule, ConfigModule],
   providers: [Web3Service],
   exports: [Web3Service],
 })
 export class Web3Module {
   constructor(web3: Web3Service) {
     setTimeout(() => {
-      // web3.setProvider();
-      // web3.syncBlocks();
+      web3.setProvider();
+      web3.syncBlocks();
     }, 2000);
   }
 }
