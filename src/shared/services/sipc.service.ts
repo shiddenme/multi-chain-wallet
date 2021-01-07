@@ -143,6 +143,7 @@ export class SipcService {
       console.log(`get ${node} Transaction error:`, blockNumber, e);
       blockNumber--;
     }
+    await sleep(500);
     await this.listenBlockTransactions(blockNumber + 1, node);
   }
 }
