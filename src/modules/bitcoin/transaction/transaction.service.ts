@@ -21,7 +21,7 @@ export class BtcTransactionService {
   ) {}
   async getTransactionByAddress(query) {
     const { wallet, pageIndex = 1, pageSize = 10 } = query;
-    const offset = parseInt(pageIndex) - 1;
+    const offset = (parseInt(pageIndex) - 1) * parseInt(pageSize);
     const limit = parseInt(pageSize);
     const address = asAddress(wallet);
     const validateaddressResult = await this.btcService.sendRequest(
