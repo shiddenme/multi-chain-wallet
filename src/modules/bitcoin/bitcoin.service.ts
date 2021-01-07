@@ -20,6 +20,9 @@ export class BitcoinService {
 
   async sendRequest(method: string, params: any[]) {
     try {
+      this.logger.log(
+        `send to ${this.config.get('bitcoin')[global.activeBlockchain]}`,
+      );
       const res = await this.httpService
         .post(
           this.config.get('bitcoin')[global.activeBlockchain],
