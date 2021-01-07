@@ -40,6 +40,11 @@ class findAssetDto {
   @IsNotEmpty({ message: '钱包地址为空' })
   wallet: string;
 }
+
+class networkDto {
+  @IsNotEmpty({ message: '目标网络为空' })
+  network: string;
+}
 @Controller('btc')
 export class BtcTransactionController {
   private readonly logger = new Logger(BtcTransactionController.name);
@@ -53,9 +58,9 @@ export class BtcTransactionController {
 
   @Get('/network')
   @UseFilters(new HttpExceptionFilter())
-  async getNetWork() {
-    const currentNetwork = global.activeBlockchain;
-    global.activeBlockchain = currentNetwork === 'main' ? 'test' : 'main';
+  async getNetWork(@Query() query: networkDto) {
+    const { network } = query;
+    global.activeBlockchain = network === 'main' ? 'main' : 'test';
     this.logger.debug(`change network to ${global.activeBlockchain}`);
     return {
       currentNetwork: global.activeBlockchain,
