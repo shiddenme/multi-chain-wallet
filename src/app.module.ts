@@ -5,7 +5,6 @@ import { SipcModule } from './shared';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { ScheduleModule } from '@nestjs/schedule';
-import { BtcTransactionModule } from './modules/bitcoin/transaction/transaction.module';
 
 @Module({
   imports: [
@@ -16,7 +15,6 @@ import { BtcTransactionModule } from './modules/bitcoin/transaction/transaction.
     }),
     CoreModule,
     SipcModule,
-    BtcTransactionModule,
   ],
 })
 export class AppModule {}
