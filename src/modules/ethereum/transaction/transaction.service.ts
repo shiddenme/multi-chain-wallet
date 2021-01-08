@@ -61,21 +61,36 @@ export class EthTransactionService {
     const limit = Number(pageSize);
     const offset = pageIndex < 1 ? 0 : Number(pageIndex - 1) * Number(pageSize);
 
+    const tableName = `eth_transaction_${token.sort}`;
+    const sql_from = `select * from ${tableName} where \`from\` = '${wallet}' order by timestamp desc limit ${
+      offset + limit
+    }`;
+    const sql_to = `select * from ${tableName} where \`to\` = '${wallet}' order by timestamp desc limit ${
+      offset + limit
+    }`;
+    const res_from = await this.sequelize.query(sql_from, {
+      raw: true,
+    });
+    const res_to = await this.sequelize.query(sql_to, {
+      raw: true,
+    });
+    let res: eth_transaction[];
     let condition = ' 1 = 1';
     if (search === 'from') {
       condition += ` and \`from\` = '${wallet}'`;
+      res = res_from[0].slice(offset, offset + limit);
     } else if (search === 'to') {
       condition += ` and \`to\` = '${wallet}'`;
+      res = res_to[0].slice(offset, offset + limit);
     } else {
       condition += ` and (\`from\` = '${wallet}' or \`to\` = '${wallet}')`;
+      res = res_from[0].concat(res_to[0]).slice(offset, offset + limit);
     }
-    const tableName = `eth_transaction_${token.sort}`;
-    const sql = `select * from ${tableName} where ${condition} order by timestamp limit ${offset},${limit}`;
     const sql_count = `select count(1) as count from ${tableName} where ${condition}`;
-    const res = await this.sequelize.query(sql);
+
     const res1 = await this.sequelize.query(sql_count, { raw: true });
     const transactions = await Promise.all(
-      res[0].map(async (transaction) => {
+      res.map(async (transaction) => {
         const {
           hash,
           blockHash,
